@@ -44,8 +44,8 @@ export interface SanityAnnouncement {
   linkText?: string;
   variant: "info" | "success" | "warning";
 }
-
 export interface SanityData {
   projects: SanityProject[];
   blogPosts: SanityBlogPost[];
+  announcement?: SanityAnnouncement;
 }

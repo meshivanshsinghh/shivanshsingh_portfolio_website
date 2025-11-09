@@ -2,29 +2,30 @@ import Hero from "@/components/sections/hero";
 import ExperienceSection from "@/components/sections/experience-section";
 import ProjectsSection from "@/components/sections/projects-section";
 import WritingsSection from "@/components/sections/writings-section";
-import { Separator } from "@/components/ui/separator";
 import { fetchPortfolioData } from "@/lib/sanity-service";
-import AnnouncementBar from "@/components/layout/announcement-bar";
 
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 
 export default async function Home() {
   const portfolioData = await fetchPortfolioData();
 
   return (
-    <>
-      {portfolioData.announcement && (
-        <AnnouncementBar announcement={portfolioData.announcement} />
-      )}
-      <div className="pb-16">
-        <Hero />
-        <Separator className="my-8" />
+    <div className="relative">
+      {/* Hero with announcement */}
+      <Hero announcement={portfolioData.announcement} />
+      
+      {/* Gradient divider */}
+      <div className="absolute left-0 right-0 h-px bg-linear-to-r from-transparent via-border to-transparent" />
+      
+      {/* Content sections */}
+      <div className="relative">
         <ExperienceSection />
-        <Separator className="my-8" />
         <ProjectsSection projects={portfolioData.projects} />
-        <Separator className="my-8" />
         <WritingsSection blogPosts={portfolioData.blogPosts} />
       </div>
-    </>
+
+      {/* Footer gradient */}
+      <div className="absolute bottom-0 left-0 right-0 h-64 bg-linear-to-t from-background via-background/50 to-transparent pointer-events-none" />
+    </div>
   );
 }
