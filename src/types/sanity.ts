@@ -26,14 +26,23 @@ export interface SanityBlogPost {
   description: string;
   publishedAt: string;
   tags: string[];
-  views?: number;  // Add this line
-  body: any; // Portable text
+  views?: number;
+  body: any;
   coverImage?: {
     asset: {
       _ref: string;
       _type: string;
     };
   };
+}
+
+export interface SanityAnnouncement {
+  _id: string;
+  isActive: boolean;
+  text: string;
+  link?: string;
+  linkText?: string;
+  variant: "info" | "success" | "warning";
 }
 
 export interface SanityData {

@@ -5,7 +5,7 @@ const CACHE_KEY = "portfolio_sanity_data";
 const CACHE_DURATION = 24 * 60 * 60 * 1000;
 
 const PORTFOLIO_QUERY = `{
-     "projects": *[_type == "project"] | order(_createdAt desc) {
+  "projects": *[_type == "project"] | order(_createdAt desc) {
     _id,
     _createdAt,
     title,
@@ -26,21 +26,37 @@ const PORTFOLIO_QUERY = `{
     publishedAt,
     tags,
     coverImage
+  },
+  "announcement": *[_type == "announcement"][0] {
+    _id,
+    isActive,
+    text,
+    link,
+    linkText,
+    variant
   }
 }`;
 
 // server side fetch with nextjs caching
 export async function fetchPortfolioData(): Promise<SanityData> {
   try {
+    const isDevelopment = process.env.NODE_ENV === "development";
+
     const data = await client.fetch<SanityData>(
       PORTFOLIO_QUERY,
       {},
-      {
-        next: {
-          revalidate: 3600,
-          tags: ["portfolio"],
-        },
-      }
+      isDevelopment
+        ? {
+            // Development: no caching
+            cache: "no-store",
+          }
+        : {
+            // Production: use caching
+            next: {
+              revalidate: 3600,
+              tags: ["portfolio"],
+            },
+          }
     );
     return data;
   } catch (error) {

@@ -36,9 +36,16 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Header />
-          <main className="min-h-screen">{children}</main>
-          <Footer />
+           <div className="relative min-h-screen">
+            <div className="fixed inset-0 -z-10 bg-background">
+              <div className="absolute inset-0 bg-linear-to-br from-primary/5 via-background to-primary/5" />
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
+            </div>
+            
+            <Header />
+            <main>{children}</main>
+            <Footer />
+          </div>
         </ThemeProvider>
       </body>
     </html>
