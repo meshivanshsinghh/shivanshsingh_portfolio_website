@@ -129,7 +129,7 @@ export default function Hero({ announcement }: HeroProps) {
           </div>
 
           {/* Right - 3D Globe Container with proper boundaries */}
-          <div className="relative w-full h-[350px] md:h-[450px] lg:h-[500px] order-1 md:order-2 overflow-hidden rounded-2xl">
+          <div className="hidden md:block relative w-full h-[350px] md:h-[450px] lg:h-[500px] order-1 md:order-2 overflow-hidden rounded-2xl">
             {/* Globe wrapper with absolute positioning */}
             <div className="absolute inset-0" style={{ isolation: 'isolate' }}>
               <Globe />
