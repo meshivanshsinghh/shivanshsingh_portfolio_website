@@ -1,8 +1,11 @@
 import Hero from "@/components/sections/hero";
+import SkillsSection from "@/components/sections/skills-section";
 import ExperienceSection from "@/components/sections/experience-section";
-import ProjectsSection from "@/components/sections/projects-section";
-import WritingsSection from "@/components/sections/writings-section";
+import YoutubeSection from "@/components/sections/youtube-section"; // NEW
+import WorkSection from "@/components/sections/work-section";
+import TestimonialsSection from "@/components/sections/testimonials-section";
 import { fetchPortfolioData } from "@/lib/sanity-service";
+import WritingsSection from "@/components/sections/writings-section";
 
 export const dynamic = 'force-dynamic';
 
@@ -14,18 +17,32 @@ export default async function Home() {
       {/* Hero with announcement */}
       <Hero announcement={portfolioData.announcement} />
       
-      {/* Gradient divider */}
-      <div className="absolute left-0 right-0 h-px bg-linear-to-r from-transparent via-border to-transparent" />
+      <div className="h-px bg-linear-to-r from-transparent via-border to-transparent" />
       
-      {/* Content sections */}
-      <div className="relative">
-        <ExperienceSection />
-        <ProjectsSection projects={portfolioData.projects} />
-        <WritingsSection blogPosts={portfolioData.blogPosts} />
-      </div>
-
-      {/* Footer gradient */}
-      <div className="absolute bottom-0 left-0 right-0 h-64 bg-linear-to-t from-background via-background/50 to-transparent pointer-events-none" />
+      <SkillsSection />
+      
+      <div className="h-px bg-linear-to-r from-transparent via-border to-transparent" />
+      
+      <ExperienceSection />
+      
+      <div className="h-px bg-linear-to-r from-transparent via-border to-transparent" />
+      
+      {/* NEW: YouTube Teaching Journey */}
+      <YoutubeSection />
+      
+      <div className="h-px bg-linear-to-r from-transparent via-border to-transparent" />
+      
+      {/* Pass Sanity projects data */}
+      <WorkSection projects={portfolioData.projects} />
+      
+      <div className="h-px bg-linear-to-r from-transparent via-border to-transparent" />
+      
+      {/* Pass Sanity blog posts data */}
+      <WritingsSection blogPosts={portfolioData.blogPosts} />
+      
+      <div className="h-px bg-linear-to-r from-transparent via-border to-transparent" />
+      
+      <TestimonialsSection />
     </div>
   );
 }
