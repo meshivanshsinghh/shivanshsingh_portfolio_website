@@ -112,10 +112,18 @@ export default function ProjectsArchivePage() {
 
           {/* Projects Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredProjects.map((project, index) => (
-              <div
+            {filteredProjects.map((project, index) => {
+              // Generate slug from title
+              const slug = project.title
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, "-")
+                .replace(/(^-|-$)/g, "");
+              
+              return (
+              <Link
                 key={index}
-                className="group relative bg-card/30 backdrop-blur-sm border border-border/50 rounded-2xl p-6 hover:bg-card/50 hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 flex flex-col"
+                href={`/projects/${slug}`}
+                className="group relative bg-card/30 backdrop-blur-sm border border-border/50 rounded-2xl p-6 hover:bg-card/50 hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 flex flex-col block"
               >
                 {/* Header */}
                 <div className="flex items-start justify-between mb-4">
@@ -124,15 +132,17 @@ export default function ProjectsArchivePage() {
                   </div>
                   <div className="flex gap-2">
                     {project.link && (
-                      <a
-                        href={project.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          window.open(project.link, '_blank', 'noopener,noreferrer');
+                        }}
                         className="p-2 rounded-lg text-muted-foreground hover:text-primary transition-all hover:scale-110"
                         aria-label="View project"
                       >
                         <ExternalLink className="h-5 w-5" />
-                      </a>
+                      </button>
                     )}
                   </div>
                 </div>
@@ -165,8 +175,9 @@ export default function ProjectsArchivePage() {
 
                 {/* Hover glow */}
                 <div className="absolute inset-0 rounded-2xl bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10 blur-xl" />
-              </div>
-            ))}
+              </Link>
+            );
+            })}
           </div>
 
           {/* Empty State */}

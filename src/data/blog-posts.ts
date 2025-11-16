@@ -4,6 +4,7 @@ export interface BlogPost {
   date: string;
   tags: string[];
   slug: string;
+  views?: number;
 }
 
 // Fallback data when Sanity is not available
