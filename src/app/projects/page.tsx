@@ -1,33 +1,63 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft, Search, Filter, Folder, Github, ExternalLink, Calendar } from "lucide-react";
 import { projects as fallbackProjects } from "@/data/projects";
 import { Button } from "@/components/ui/button";
+import { SanityProject } from "@/types/sanity";
+import { urlFor } from "@/lib/sanity";
+import { getCachedData } from "@/lib/sanity-service";
 
 export default function ProjectsArchivePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [projects, setProjects] = useState<SanityProject[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch projects from cache or use fallback
+  useEffect(() => {
+    const cachedData = getCachedData();
+    if (cachedData?.projects && cachedData.projects.length > 0) {
+      setProjects(cachedData.projects);
+    }
+    setIsLoading(false);
+  }, []);
+
+  // Use Sanity projects if available, otherwise fallback
+  const projectsData: SanityProject[] = projects.length > 0 ? projects : fallbackProjects.map((p, i) => ({
+    _id: `fallback-${i}`,
+    _createdAt: new Date().toISOString(),
+    title: p.title,
+    slug: { current: p.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") },
+    description: p.description,
+    date: p.date,
+    tags: p.tags || [],
+    link: p.link,
+    githubUrl: undefined,
+    featured: p.featured,
+    coverImage: undefined,
+  }));
 
   // Get all unique tags
   const allTags = useMemo(() => {
     const tags = new Set<string>();
-    fallbackProjects.forEach(project => {
+    projectsData.forEach(project => {
       project.tags?.forEach(tag => tags.add(tag));
     });
     return Array.from(tags).sort();
-  }, []);
+  }, [projectsData]);
 
   // Filter projects
   const filteredProjects = useMemo(() => {
-    return fallbackProjects.filter(project => {
+    return projectsData.filter(project => {
       const matchesSearch = project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                            project.description.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesTag = !selectedTag || project.tags?.includes(selectedTag);
       return matchesSearch && matchesTag;
     });
-  }, [searchQuery, selectedTag]);
+  }, [searchQuery, selectedTag, projectsData]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -52,7 +82,7 @@ export default function ProjectsArchivePage() {
 
       {/* Main Content */}
       <section className="py-20">
-        <div className="container max-w-7xl mx-auto px-4">
+        <div className="container max-w-7xl mx-auto px-6 sm:px-8 md:px-12 lg:px-4">
           {/* Page Header */}
           <div className="mb-12">
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-4">
@@ -107,69 +137,104 @@ export default function ProjectsArchivePage() {
 
           {/* Results Count */}
           <div className="mb-6 text-sm text-muted-foreground">
-            Showing {filteredProjects.length} of {fallbackProjects.length} projects
+            Showing {filteredProjects.length} of {projectsData.length} projects
           </div>
 
           {/* Projects Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredProjects.map((project, index) => {
-              // Generate slug from title
-              const slug = project.title
-                .toLowerCase()
-                .replace(/[^a-z0-9]+/g, "-")
-                .replace(/(^-|-$)/g, "");
+              const slug = project.slug.current;
+              
+              // Get image URL if available
+              let imageUrl: string | undefined;
+              if (project.coverImage?.asset) {
+                try {
+                  imageUrl = urlFor(project.coverImage).width(600).height(400).url();
+                } catch (error) {
+                  console.error("Error generating image URL:", error);
+                }
+              }
               
               return (
               <Link
-                key={index}
+                key={project._id}
                 href={`/projects/${slug}`}
-                className="group relative bg-card/30 backdrop-blur-sm border border-border/50 rounded-2xl p-6 hover:bg-card/50 hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 flex flex-col block"
+                className="group relative bg-card/30 backdrop-blur-sm border border-border/50 rounded-2xl overflow-hidden hover:bg-card/50 hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 flex flex-col"
               >
-                {/* Header */}
-                <div className="flex items-start justify-between mb-4">
-                  <div className="p-3 rounded-xl bg-primary/10 text-primary group-hover:scale-110 transition-transform">
-                    <Folder className="h-8 w-8" />
+                {/* Featured Image */}
+                {imageUrl ? (
+                  <div className="relative h-48 overflow-hidden bg-muted">
+                    <Image
+                      src={imageUrl}
+                      alt={project.title}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
                   </div>
-                  <div className="flex gap-2">
-                    {project.link && (
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          window.open(project.link, '_blank', 'noopener,noreferrer');
-                        }}
-                        className="p-2 rounded-lg text-muted-foreground hover:text-primary transition-all hover:scale-110"
-                        aria-label="View project"
-                      >
-                        <ExternalLink className="h-5 w-5" />
-                      </button>
-                    )}
+                ) : (
+                  <div className="relative h-48 bg-gradient-to-br from-primary/20 via-primary/10 to-background flex items-center justify-center">
+                    <Folder className="h-16 w-16 text-primary/30" />
                   </div>
-                </div>
+                )}
 
                 {/* Content */}
-                <h3 className="text-xl font-bold mb-3 group-hover:text-primary transition-colors">
-                  {project.title}
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-4 flex-grow">
-                  {project.description}
-                </p>
-
-                {/* Footer */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <Calendar className="h-3 w-3" />
-                    {project.date}
+                <div className="p-6 flex flex-col flex-grow">
+                  {/* Header with Links */}
+                  <div className="flex items-start justify-between mb-3">
+                    <h3 className="text-xl font-bold group-hover:text-primary transition-colors flex-1 line-clamp-2">
+                      {project.title}
+                    </h3>
+                    <div className="flex gap-2 ml-2">
+                      {project.githubUrl && (
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            window.open(project.githubUrl, '_blank', 'noopener,noreferrer');
+                          }}
+                          className="p-2 rounded-lg text-muted-foreground hover:text-primary transition-all hover:scale-110"
+                          aria-label="View on GitHub"
+                        >
+                          <Github className="h-4 w-4" />
+                        </button>
+                      )}
+                      {project.link && (
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            window.open(project.link, '_blank', 'noopener,noreferrer');
+                          }}
+                          className="p-2 rounded-lg text-muted-foreground hover:text-primary transition-all hover:scale-110"
+                          aria-label="View live demo"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                        </button>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    {project.tags?.slice(0, 3).map((tag) => (
-                      <span
-                        key={tag}
-                        className="text-xs px-2 py-1 rounded-md bg-primary/10 text-primary"
-                      >
-                        {tag}
-                      </span>
-                    ))}
+
+                  <p className="text-sm text-muted-foreground leading-relaxed mb-4 flex-grow line-clamp-3">
+                    {project.description}
+                  </p>
+
+                  {/* Footer */}
+                  <div className="space-y-3 mt-auto">
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Calendar className="h-3 w-3" />
+                      {project.date}
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {project.tags?.slice(0, 3).map((tag) => (
+                        <span
+                          key={tag}
+                          className="text-xs px-2 py-1 rounded-md bg-primary/10 text-primary border border-primary/20"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
 

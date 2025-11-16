@@ -80,14 +80,14 @@ export default function WorkSection({ projects: sanityProjects }: WorkSectionPro
 
   return (
     <section className="py-20">
-      <div className="container max-w-5xl mx-auto px-8 sm:px-6 md:px-4">
+      <div className="container max-w-5xl mx-auto px-6 sm:px-8 md:px-12 lg:px-4">
         {/* Section Header */}
         <div className="mb-12">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4">
             <Code2 className="h-4 w-4 text-primary" />
             <span className="text-sm font-medium text-primary">Work</span>
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-2">
+          <h2 className="text-3xl md:text-3xl font-bold tracking-tight mb-2">
             Some Things I've <span className="text-primary">Built</span>
           </h2>
         </div>

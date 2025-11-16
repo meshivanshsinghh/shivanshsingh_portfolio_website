@@ -1,28 +1,53 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft, Search, Calendar, Clock, TrendingUp, Tag } from "lucide-react";
 import { blogPosts as fallbackBlogPosts } from "@/data/blog-posts";
 import { Button } from "@/components/ui/button";
+import { SanityBlogPost } from "@/types/sanity";
+import { urlFor } from "@/lib/sanity";
+import { getCachedData } from "@/lib/sanity-service";
 
 export default function BlogArchivePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<"date" | "views">("date");
+  const [blogPosts, setBlogPosts] = useState<SanityBlogPost[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch blog posts from cache or use fallback
+  useEffect(() => {
+    const cachedData = getCachedData();
+    if (cachedData?.blogPosts && cachedData.blogPosts.length > 0) {
+      setBlogPosts(cachedData.blogPosts);
+    }
+    setIsLoading(false);
+  }, []);
+
+  // Use Sanity posts if available, otherwise fallback
+  const postsData = blogPosts.length > 0 ? blogPosts.map(post => ({
+    ...post,
+    date: new Date(post.publishedAt).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }),
+  })) : fallbackBlogPosts;
 
   // Get all unique tags
   const allTags = useMemo(() => {
     const tags = new Set<string>();
-    fallbackBlogPosts.forEach(post => {
+    postsData.forEach(post => {
       post.tags?.forEach(tag => tags.add(tag));
     });
     return Array.from(tags).sort();
-  }, []);
+  }, [postsData]);
 
   // Filter and sort posts
   const filteredPosts = useMemo(() => {
-    let posts = fallbackBlogPosts.filter(post => {
+    let posts = postsData.filter(post => {
       const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                            post.description.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesTag = !selectedTag || post.tags?.includes(selectedTag);
@@ -33,11 +58,15 @@ export default function BlogArchivePage() {
     if (sortBy === "views") {
       posts = [...posts].sort((a, b) => (b.views || 0) - (a.views || 0));
     } else {
-      posts = [...posts].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      posts = [...posts].sort((a, b) => {
+        const dateA = 'publishedAt' in a ? new Date(a.publishedAt).getTime() : new Date(a.date).getTime();
+        const dateB = 'publishedAt' in b ? new Date(b.publishedAt).getTime() : new Date(b.date).getTime();
+        return dateB - dateA;
+      });
     }
 
     return posts;
-  }, [searchQuery, selectedTag, sortBy]);
+  }, [searchQuery, selectedTag, sortBy, postsData]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -62,7 +91,7 @@ export default function BlogArchivePage() {
 
       {/* Main Content */}
       <section className="py-20">
-        <div className="container max-w-7xl mx-auto px-4">
+        <div className="container max-w-7xl mx-auto px-6 sm:px-8 md:px-12 lg:px-4">
           {/* Page Header */}
           <div className="mb-12">
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-4">
@@ -129,20 +158,46 @@ export default function BlogArchivePage() {
 
           {/* Results Count */}
           <div className="mb-6 text-sm text-muted-foreground">
-            Showing {filteredPosts.length} of {fallbackBlogPosts.length} posts
+            Showing {filteredPosts.length} of {postsData.length} posts
           </div>
 
           {/* Blog Posts List */}
           <div className="space-y-6">
-            {filteredPosts.map((post, index) => (
+            {filteredPosts.map((post, index) => {
+              const slug = 'slug' in post && typeof post.slug === 'object' ? post.slug.current : post.slug;
+              
+              // Get image URL if available
+              let imageUrl: string | undefined;
+              if ('coverImage' in post && post.coverImage?.asset) {
+                try {
+                  imageUrl = urlFor(post.coverImage).width(800).height(400).url();
+                } catch (error) {
+                  console.error("Error generating image URL:", error);
+                }
+              }
+
+              return (
               <Link
-                key={index}
-                href={`/blog/${post.slug}`}
+                key={'_id' in post ? post._id : index}
+                href={`/blog/${slug}`}
                 className="group block"
               >
-                <article className="bg-card/30 backdrop-blur-sm border border-border/50 rounded-2xl p-8 hover:bg-card/50 hover:border-primary/30 transition-all duration-300">
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-                    <div className="flex-1">
+                <article className="bg-card/30 backdrop-blur-sm border border-border/50 rounded-2xl overflow-hidden hover:bg-card/50 hover:border-primary/30 transition-all duration-300">
+                  <div className="flex flex-col md:flex-row gap-6">
+                    {/* Featured Image */}
+                    {imageUrl && (
+                      <div className="relative md:w-64 h-48 md:h-auto overflow-hidden bg-muted flex-shrink-0">
+                        <Image
+                          src={imageUrl}
+                          alt={post.title}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      </div>
+                    )}
+
+                    {/* Content */}
+                    <div className="flex-1 p-6 md:py-6 md:pr-6 md:pl-0">
                       <h2 className="text-2xl font-bold mb-2 group-hover:text-primary transition-colors">
                         {post.title}
                       </h2>
@@ -151,7 +206,7 @@ export default function BlogArchivePage() {
                       </p>
                       
                       {/* Meta Info */}
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                      <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-4">
                         <div className="flex items-center gap-1">
                           <Calendar className="h-4 w-4" />
                           {post.date}
@@ -167,24 +222,25 @@ export default function BlogArchivePage() {
                           5 min read
                         </div>
                       </div>
-                    </div>
-                  </div>
 
-                  {/* Tags */}
-                  <div className="flex flex-wrap gap-2">
-                    {post.tags?.map((tag) => (
-                      <span
-                        key={tag}
-                        className="inline-flex items-center gap-1 px-3 py-1 text-xs rounded-full bg-primary/10 text-primary border border-primary/20"
-                      >
-                        <Tag className="h-3 w-3" />
-                        {tag}
-                      </span>
-                    ))}
+                      {/* Tags */}
+                      <div className="flex flex-wrap gap-2">
+                        {post.tags?.map((tag) => (
+                          <span
+                            key={tag}
+                            className="inline-flex items-center gap-1 px-3 py-1 text-xs rounded-full bg-primary/10 text-primary border border-primary/20"
+                          >
+                            <Tag className="h-3 w-3" />
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </article>
               </Link>
-            ))}
+            );
+            })}
           </div>
 
           {/* Empty State */}

@@ -48,7 +48,7 @@ export default function GitHubStats({
               GitHub Activity
             </span>
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
+          <h2 className="text-3xl md:text-3xl font-bold tracking-tight">
             Open Source <span className="text-primary">Contributions</span>
           </h2>
         </div>

@@ -195,7 +195,7 @@ export function AnimatedHero() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.2, duration: 0.8 }}
-        className="absolute bottom-30 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 cursor-pointer group z-10"
+        className="absolute bottom-23 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 cursor-pointer group z-10"
         onClick={() => {
           window.scrollTo({
             top: window.innerHeight,
