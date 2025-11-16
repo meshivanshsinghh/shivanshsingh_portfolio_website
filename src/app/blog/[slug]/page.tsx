@@ -8,9 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Calendar, Clock } from "lucide-react";
 
 interface BlogPostPageProps {
-    params: {
+    params: Promise<{
         slug: string;
-    };
+    }>;
 }
 
 const POST_QUERY = `*[_type == "post" && slug.current == $slug][0]{
@@ -34,7 +34,8 @@ async function getPost(slug: string) {
 }
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
-    const post = await getPost(params.slug);
+    const { slug } = await params;
+    const post = await getPost(slug);
 
     if (!post) {
         notFound();

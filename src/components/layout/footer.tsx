@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Github, Linkedin, Twitter, Instagram, Send } from "lucide-react";
+import { Github, Linkedin, Twitter, Instagram, Send, CheckCircle2, AlertCircle } from "lucide-react";
 
 export default function Footer() {
   const [formData, setFormData] = useState({
@@ -11,11 +11,44 @@ export default function Footer() {
     subject: "",
     message: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
-    console.log("Form submitted:", formData);
+    setIsSubmitting(true);
+    setSubmitStatus("idle");
+
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          access_key: process.env.NEXT_PUBLIC_WEB3FORMS_KEY || "YOUR_ACCESS_KEY_HERE",
+          name: formData.name,
+          email: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setSubmitStatus("success");
+        setFormData({ name: "", email: "", subject: "", message: "" });
+        setTimeout(() => setSubmitStatus("idle"), 5000);
+      } else {
+        setSubmitStatus("error");
+      }
+    } catch (error) {
+      console.error("Form submission error:", error);
+      setSubmitStatus("error");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -31,10 +64,10 @@ export default function Footer() {
               <p className="text-lg text-muted-foreground mb-2">
                 Say hello at{" "}
                 <a
-                  href="mailto:shivansh@example.com"
+                  href="mailto:singh.shivan@northeastern.edu"
                   className="text-primary hover:underline"
                 >
-                  shivansh@example.com
+                  singh.shivan@northeastern.edu
                 </a>
               </p>
               <p className="text-muted-foreground">
@@ -51,7 +84,7 @@ export default function Footer() {
             {/* Social Links */}
             <div className="flex gap-4">
               <a
-                href="https://linkedin.com/in/yourusername"
+                href="https://linkedin.com/in/shivanshsinghh"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-3 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary transition-all hover:scale-110"
@@ -59,7 +92,7 @@ export default function Footer() {
                 <Linkedin className="h-6 w-6" />
               </a>
               <a
-                href="https://github.com/yourusername"
+                href="https://github.com/meshivanshsinghh"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-3 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary transition-all hover:scale-110"
@@ -67,7 +100,7 @@ export default function Footer() {
                 <Github className="h-6 w-6" />
               </a>
               <a
-                href="https://twitter.com/yourusername"
+                href="https://x.com/shivanshneu"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-3 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary transition-all hover:scale-110"
@@ -75,7 +108,7 @@ export default function Footer() {
                 <Twitter className="h-6 w-6" />
               </a>
               <a
-                href="https://instagram.com/yourusername"
+                href="https://www.instagram.com/shivanshsinghh_/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-3 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary transition-all hover:scale-110"
@@ -176,10 +209,38 @@ export default function Footer() {
                 />
               </div>
 
-              <Button type="submit" size="lg" className="w-full group">
-                <Send className="mr-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                Send Message
+              <Button 
+                type="submit" 
+                size="lg" 
+                className="w-full group" 
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <Send className="mr-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                    Send Message
+                  </>
+                )}
               </Button>
+
+              {/* Success/Error Messages */}
+              {submitStatus === "success" && (
+                <div className="flex items-center gap-2 text-green-600 dark:text-green-400 text-sm">
+                  <CheckCircle2 className="h-5 w-5" />
+                  <span>Message sent successfully! I'll get back to you soon.</span>
+                </div>
+              )}
+              {submitStatus === "error" && (
+                <div className="flex items-center gap-2 text-red-600 dark:text-red-400 text-sm">
+                  <AlertCircle className="h-5 w-5" />
+                  <span>Failed to send message. Please try again or email me directly.</span>
+                </div>
+              )}
             </form>
           </div>
         </div>
