@@ -37,10 +37,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <div className="relative min-h-screen bg-background">
+          <div className="relative min-h-screen">
             <SocialSidebar />
             <Header />
-            <main className="relative">{children}</main>
+            <main>{children}</main>
             <Footer />
           </div>
         </ThemeProvider>

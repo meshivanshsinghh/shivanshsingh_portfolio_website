@@ -24,9 +24,9 @@ const skills = [
 
 export default function SkillsSection() {
   return (
-    <section className="relative py-20 overflow-hidden">
+    <section className="py-20 overflow-hidden">
     
-      <div className="container max-w-5xl mx-auto px-4 relative">
+      <div className="container max-w-5xl mx-auto px-8 sm:px-6 md:px-4">
         {/* Section Header */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4">

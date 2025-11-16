@@ -24,13 +24,12 @@ const socialLinks = [
     url: "https://www.instagram.com/shivanshsinghh_/",
     icon: Instagram,
   },
- 
 ];
 
 export default function SocialSidebar() {
   return (
     <>
-      {/* Left Side - Social Icons */}
+      {/* Desktop - Left Side - Social Icons */}
       <div className="hidden xl:fixed xl:flex xl:flex-col xl:gap-6 xl:left-8 xl:bottom-0 xl:z-40">
         <div className="flex flex-col gap-5 items-center">
           {socialLinks.map((social) => {
@@ -53,7 +52,7 @@ export default function SocialSidebar() {
         <div className="w-[2px] h-24 bg-border/50 mx-auto" />
       </div>
 
-      {/* Right Side - Email */}
+      {/* Desktop - Right Side - Email */}
       <div className="hidden xl:fixed xl:flex xl:flex-col xl:gap-6 xl:right-8 xl:bottom-0 xl:z-40">
         <a
           href="mailto:singh.shiva@northeastern.edu"

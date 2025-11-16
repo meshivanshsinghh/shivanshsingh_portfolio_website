@@ -53,7 +53,7 @@ export default function Footer() {
 
   return (
     <footer className="relative border-t border-border/50">
-      <div className="container max-w-7xl mx-auto px-4 py-20 relative">
+      <div className="container max-w-7xl mx-auto px-6 sm:px-8 md:px-12 lg:px-4 py-20 relative">
         <div className="grid lg:grid-cols-2 gap-16">
           {/* Left - Info */}
           <div className="space-y-8">
