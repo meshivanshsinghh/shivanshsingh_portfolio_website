@@ -17,7 +17,7 @@ function FloatingPaths({ position }: { position: number }) {
   }));
 
   return (
-    <div className="absolute inset-0 pointer-events-none opacity-25 dark:opacity-35">
+    <div className="absolute inset-0 pointer-events-none opacity-20 dark:opacity-28">
       <svg
         className="w-full h-full text-primary"
         viewBox="0 0 696 316"
@@ -31,15 +31,18 @@ function FloatingPaths({ position }: { position: number }) {
             stroke="currentColor"
             strokeWidth={0.6 + path.id * 0.025}
             strokeOpacity={0.12 + path.id * 0.025}
-            initial={{ pathLength: 0.3, opacity: 0.4 }}
+            initial={{ pathLength: 0, opacity: 0 }}
             animate={{
               pathLength: 1,
               opacity: [0.25, 0.5, 0.25],
             }}
             transition={{
-              duration: 20 + Math.random() * 10,
-              repeat: Number.POSITIVE_INFINITY,
-              ease: "linear",
+              pathLength: { duration: 4.5, ease: "easeOut", delay: path.id * 0.05 },
+              opacity: {
+                duration: 4 + Math.random() * 2,
+                repeat: Number.POSITIVE_INFINITY,
+                ease: "easeInOut",
+              },
             }}
           />
         ))}
@@ -50,16 +53,22 @@ function FloatingPaths({ position }: { position: number }) {
 
 export function AnimatedHero() {
   return (
-    <section className="relative pt-24 pb-16 md:pt-32 md:pb-20 overflow-hidden">
+    <section className="relative min-h-screen flex flex-col pt-20 pb-12 md:pt-24 md:pb-20 overflow-visible">
+      {/* Solid background that fades out at bottom */}
+      <div className="absolute inset-0 -z-20 bg-gradient-to-b from-background via-background to-transparent" />
+      
+      {/* Dark overlay for better line visibility - also fades out */}
+      <div className="absolute inset-0 -z-20 bg-gradient-to-b from-black/8 via-black/6 to-transparent dark:from-black/30 dark:via-black/20 dark:to-transparent" />
+      
       {/* Animated Background */}
       <div className="absolute inset-0">
         <FloatingPaths position={1} />
         <FloatingPaths position={-1} />
       </div>
 
-      <div className="container max-w-6xl mx-auto px-4">
+      <div className="container max-w-6xl mx-auto px-8 sm:px-6 md:px-4 flex-1 flex items-start">
         {/* Grid layout with Globe */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:items-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 md:items-center w-full">
           {/* Left Content */}
           <div className="space-y-8 order-2 md:order-1">
             {/* Status Badge */}
@@ -105,10 +114,10 @@ export function AnimatedHero() {
                     initial={{ y: 50, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{
-                      delay: 0.5 + index * 0.03,
+                      delay: 0.3 + index * 0.015,
                       type: "spring",
-                      stiffness: 150,
-                      damping: 25,
+                      stiffness: 200,
+                      damping: 20,
                     }}
                     className="inline-block bg-gradient-to-br from-foreground to-foreground/60 bg-clip-text text-transparent"
                   >
@@ -120,7 +129,7 @@ export function AnimatedHero() {
               <motion.p
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 1 }}
+                transition={{ delay: 0.6 }}
                 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent"
               >
                 AI/ML Engineer
@@ -131,7 +140,7 @@ export function AnimatedHero() {
             <motion.p
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 1.2 }}
+              transition={{ delay: 0.7 }}
               className="text-lg md:text-xl text-muted-foreground leading-relaxed"
             >
               Building intelligent systems at the intersection of{" "}
@@ -143,7 +152,7 @@ export function AnimatedHero() {
             <motion.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 1.4 }}
+              transition={{ delay: 0.8 }}
               className="flex flex-wrap gap-4"
             >
               <Button size="lg" className="group" asChild>
@@ -180,6 +189,43 @@ export function AnimatedHero() {
           </motion.div>
         </div>
       </div>
+
+      {/* Scroll Down Indicator - Fixed at bottom */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.2, duration: 0.8 }}
+        className="absolute bottom-30 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 cursor-pointer group z-10"
+        onClick={() => {
+          window.scrollTo({
+            top: window.innerHeight,
+            behavior: 'smooth'
+          });
+        }}
+      >
+        <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
+          Scroll to explore
+        </span>
+        <motion.div
+          animate={{ y: [0, 8, 0] }}
+          transition={{
+            duration: 1.5,
+            repeat: Number.POSITIVE_INFINITY,
+            ease: "easeInOut"
+          }}
+          className="w-6 h-10 rounded-full border-2 border-muted-foreground/30 group-hover:border-foreground/50 transition-colors flex items-start justify-center p-2"
+        >
+          <motion.div
+            animate={{ y: [0, 12, 0], opacity: [1, 0, 1] }}
+            transition={{
+              duration: 1.5,
+              repeat: Number.POSITIVE_INFINITY,
+              ease: "easeInOut"
+            }}
+            className="w-1.5 h-1.5 rounded-full bg-muted-foreground group-hover:bg-foreground transition-colors"
+          />
+        </motion.div>
+      </motion.div>
     </section>
   );
 }

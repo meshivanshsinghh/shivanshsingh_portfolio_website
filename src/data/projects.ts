@@ -2,8 +2,6 @@ export interface Project {
   title: string;
   description: string;
   date: string;
-  stars?: number;
-  image?: string;
   tags?: string[];
   link?: string;
   featured?: boolean;

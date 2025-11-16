@@ -18,6 +18,7 @@ export default function Globe() {
   const rotationRef = useRef({ x: 0, y: 0 });
   const autoRotateRef = useRef<boolean>(true);
   const targetRotationRef = useRef({ x: 0, y: 0 });
+  const hasInteractedRef = useRef<boolean>(false);
 
   useEffect(() => {
     if (!containerRef.current || globeRef.current) return;
@@ -183,15 +184,33 @@ export default function Globe() {
 
         setLoadingProgress(90);
 
-        // Start with default view (showing Africa/Europe)
-        globe.rotation.y = 0;
-        globe.rotation.x = 0;
+        // Try to restore saved rotation from localStorage
+        let savedRotation = null;
+        try {
+          const saved = localStorage.getItem('globe-rotation');
+          if (saved) {
+            savedRotation = JSON.parse(saved);
+            hasInteractedRef.current = true;
+            autoRotateRef.current = false; // Don't auto-rotate if we have saved state
+          }
+        } catch (e) {
+          // Ignore localStorage errors
+        }
         
-        // Set initial rotation
-        rotationRef.current.x = 0;
-        rotationRef.current.y = 0;
+        // Set initial rotation (either saved or default)
+        if (savedRotation) {
+          rotationRef.current.x = savedRotation.x;
+          rotationRef.current.y = savedRotation.y;
+          globe.rotation.x = savedRotation.x;
+          globe.rotation.y = savedRotation.y;
+        } else {
+          globe.rotation.y = 0;
+          globe.rotation.x = 0;
+          rotationRef.current.x = 0;
+          rotationRef.current.y = 0;
+        }
         
-        // Calculate target rotation for Boston
+        // Calculate target rotation for Boston (only used if no saved state)
         // Boston coordinates: 42.3601° N, 71.0589° W
         const bostonLng = -71.0589;
         const bostonLat = 42.3601;
@@ -209,6 +228,7 @@ export default function Globe() {
         // Mouse/Touch handlers
         const handleMouseDown = (event: MouseEvent) => {
           autoRotateRef.current = false; // Stop auto-rotation on user interaction
+          hasInteractedRef.current = true;
           mouseRef.current.down = true;
           mouseRef.current.x = event.clientX;
           mouseRef.current.y = event.clientY;
@@ -218,6 +238,18 @@ export default function Globe() {
         const handleMouseUp = () => {
           mouseRef.current.down = false;
           if (container) container.style.cursor = 'grab';
+          
+          // Save rotation to localStorage
+          if (hasInteractedRef.current) {
+            try {
+              localStorage.setItem('globe-rotation', JSON.stringify({
+                x: rotationRef.current.x,
+                y: rotationRef.current.y
+              }));
+            } catch (e) {
+              // Ignore localStorage errors
+            }
+          }
         };
 
         const handleMouseMove = (event: MouseEvent) => {
@@ -242,6 +274,7 @@ export default function Globe() {
         const handleTouchStart = (event: TouchEvent) => {
           if (event.touches.length === 1) {
             autoRotateRef.current = false; // Stop auto-rotation on user interaction
+            hasInteractedRef.current = true;
             mouseRef.current.down = true;
             mouseRef.current.x = event.touches[0].clientX;
             mouseRef.current.y = event.touches[0].clientY;
@@ -250,6 +283,18 @@ export default function Globe() {
 
         const handleTouchEnd = () => {
           mouseRef.current.down = false;
+          
+          // Save rotation to localStorage
+          if (hasInteractedRef.current) {
+            try {
+              localStorage.setItem('globe-rotation', JSON.stringify({
+                x: rotationRef.current.x,
+                y: rotationRef.current.y
+              }));
+            } catch (e) {
+              // Ignore localStorage errors
+            }
+          }
         };
 
         const handleTouchMove = (event: TouchEvent) => {

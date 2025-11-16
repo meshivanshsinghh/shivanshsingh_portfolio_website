@@ -6,7 +6,10 @@ import Image from "next/image";
 export default function ExperienceEducationSection() {
   return (
     <section className="relative py-20">
-      <div className="container max-w-5xl mx-auto px-4">
+      {/* Subtle gradient overlay at top to blend with hero */}
+      <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-background/50 to-transparent pointer-events-none -z-10" />
+      
+      <div className="container max-w-5xl mx-auto px-8 sm:px-6 md:px-4">
         <div className="grid md:grid-cols-2 gap-12">
           {/* Work Experience Column */}
           <div className="md:col-span-1">

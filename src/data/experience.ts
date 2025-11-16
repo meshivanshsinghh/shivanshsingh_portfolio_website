@@ -23,4 +23,5 @@ export const experiences: Experience[] = [
     ],
     skills: ["Flutter", "AWS", "Firebase", "DynamoDB", "Lambda", "S3"]
   },
+  
 ];

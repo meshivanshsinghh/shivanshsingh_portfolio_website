@@ -23,5 +23,6 @@ export const education: Education[] = [
     field: "Data Science",
     period: "2023 - 2024",
     location: "Bangalore, India",
+    gpa: "3.7",
   },
 ];
