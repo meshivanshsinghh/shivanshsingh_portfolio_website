@@ -77,7 +77,7 @@ export default function Hero({ announcement }: HeroProps) {
             {/* CTA Buttons */}
             <div className="flex flex-wrap gap-4">
               <Button size="lg" className="group" asChild>
-                <a href="mailto:your.email@example.com">
+                <a href="mailto:singh.shivan@northeastern.edu">
                   <Mail className="mr-2 h-5 w-5" />
                   Get in Touch
                   <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -101,7 +101,7 @@ export default function Hero({ announcement }: HeroProps) {
               <span className="text-sm text-muted-foreground">Connect:</span>
               <div className="flex gap-3">
                 <a
-                  href="https://github.com/yourusername"
+                  href="https://github.com/meshivanshsinghh"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-2 rounded-lg bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-all hover:scale-110"
@@ -109,7 +109,7 @@ export default function Hero({ announcement }: HeroProps) {
                   <Github className="h-5 w-5" />
                 </a>
                 <a
-                  href="https://linkedin.com/in/yourusername"
+                  href="https://linkedin.com/in/shivanshsinghh"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-2 rounded-lg bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-all hover:scale-110"
@@ -117,7 +117,7 @@ export default function Hero({ announcement }: HeroProps) {
                   <Linkedin className="h-5 w-5" />
                 </a>
                 <a
-                  href="https://twitter.com/yourusername"
+                  href="https://x.com/shivanshneu"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-2 rounded-lg bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-all hover:scale-110"

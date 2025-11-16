@@ -2,20 +2,37 @@ export interface SanityProject {
   _id: string;
   _createdAt: string;
   title: string;
+  slug: {
+    current: string;
+  };
   description: string;
+  overview?: string;
   date: string;
   tags: string[];
+  technologies?: Array<{
+    name: string;
+    url?: string;
+  }>;
+  features?: string[];
   link?: string;
   githubUrl?: string;
-  image?: {
+  coverImage?: {
     asset: {
       _ref: string;
       _type: string;
     };
   };
+  gallery?: Array<{
+    asset: {
+      _ref: string;
+      _type: string;
+    };
+    alt?: string;
+    caption?: string;
+  }>;
+  body?: any;
   featured?: boolean;
 }
-
 export interface SanityBlogPost {
   _id: string;
   _createdAt: string;

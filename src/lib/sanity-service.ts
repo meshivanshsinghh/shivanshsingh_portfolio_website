@@ -9,12 +9,13 @@ const PORTFOLIO_QUERY = `{
     _id,
     _createdAt,
     title,
+    slug,
     description,
     date,
     tags,
     link,
     githubUrl,
-    image,
+    coverImage,
     featured
   },
   "blogPosts": *[_type == "post"] | order(publishedAt desc) {
@@ -47,16 +48,16 @@ export async function fetchPortfolioData(): Promise<SanityData> {
       {},
       isDevelopment
         ? {
-            // Development: no caching
-            cache: "no-store",
-          }
+          // Development: no caching
+          cache: "no-store",
+        }
         : {
-            // Production: use caching
-            next: {
-              revalidate: 3600,
-              tags: ["portfolio"],
-            },
-          }
+          // Production: use caching
+          next: {
+            revalidate: 3600,
+            tags: ["portfolio"],
+          },
+        }
     );
     return data;
   } catch (error) {

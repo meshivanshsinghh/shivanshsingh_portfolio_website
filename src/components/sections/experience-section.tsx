@@ -1,68 +1,88 @@
 import { experiences } from "@/data/experience";
 import { Badge } from "@/components/ui/badge";
-import { Briefcase, ArrowUpRight } from "lucide-react";
+import { Briefcase, Calendar } from "lucide-react";
+import Image from "next/image";
 
 export default function ExperienceSection() {
   return (
-    <section className="relative py-32">
+    <section className="relative py-20">
       {/* Section Title */}
-      <div className="container max-w-3xl mx-auto px-4 mb-20">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
+      <div className="container max-w-5xl mx-auto px-4 mb-12">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4">
           <Briefcase className="h-4 w-4 text-primary" />
           <span className="text-sm font-medium text-primary">Experience</span>
         </div>
-        <h2 className="text-4xl md:text-6xl font-bold tracking-tight mb-4">
-          Where I've <span className="text-primary">Worked</span>
+        <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
+          Here is a quick summary of my{" "}
+          <span className="text-primary">most recent experiences:</span>
         </h2>
       </div>
 
-      {/* Experience List */}
-      <div className="container max-w-3xl mx-auto px-4">
-        <div className="space-y-2">
+      {/* Experience List - Improved with Logo Support */}
+      <div className="container max-w-5xl mx-auto px-4">
+        <div className="space-y-6">
           {experiences.map((exp, index) => (
             <div
               key={index}
-              className="group relative bg-card/30 backdrop-blur-sm border border-border/50 rounded-2xl p-6 hover:bg-card/50 hover:border-primary/30 transition-all duration-300 cursor-pointer"
+              className="group relative bg-card/30 backdrop-blur-sm border border-border/50 rounded-2xl p-8 hover:bg-card/50 hover:border-primary/30 transition-all duration-300"
             >
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex gap-4 flex-1">
-                  {/* Company Icon */}
-                  <div className="shrink-0">
-                    <div className="w-14 h-14 rounded-xl bg-linear-to-br from-primary/20 to-primary/5 flex items-center justify-center ring-1 ring-primary/10 group-hover:ring-primary/30 transition-all">
-                      <span className="text-xl font-bold text-primary">
+              <div className="grid md:grid-cols-[120px_1fr_auto] gap-8 items-start">
+                {/* Company Logo */}
+                <div className="flex flex-col items-center gap-3">
+                  <div className="relative w-20 h-20 rounded-2xl bg-background/50 border border-border/50 flex items-center justify-center overflow-hidden group-hover:border-primary/30 transition-all shrink-0">
+                    {exp.logo ? (
+                      <Image
+                        src={exp.logo}
+                        alt={`${exp.company} logo`}
+                        width={80}
+                        height={80}
+                        className="object-contain p-2"
+                      />
+                    ) : (
+                      <span className="text-2xl font-bold text-primary">
                         {exp.company.charAt(0)}
                       </span>
-                    </div>
+                    )}
                   </div>
+                  <span className="text-sm text-muted-foreground text-center font-medium max-w-[120px]">
+                    {exp.company}
+                  </span>
+                </div>
 
-                  {/* Details */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-4 mb-2">
-                      <div>
-                        <h3 className="text-xl font-bold mb-1 group-hover:text-primary transition-colors">
-                          {exp.role}
-                        </h3>
-                        <p className="text-base font-semibold text-muted-foreground">
-                          {exp.company}
-                        </p>
-                      </div>
-                      <ArrowUpRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 group-hover:-translate-y-1 transition-all shrink-0" />
-                    </div>
+                {/* Details */}
+                <div className="space-y-3">
+                  <h3 className="text-xl font-bold group-hover:text-primary transition-colors">
+                    {exp.role}
+                  </h3>
+                  {exp.description && (
+                    <ul className="space-y-2 text-sm text-muted-foreground">
+                      {exp.description.map((desc, i) => (
+                        <li key={i} className="flex gap-2">
+                          <span className="text-primary mt-1 shrink-0">•</span>
+                          <span className="leading-relaxed">{desc}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
 
-                    <div className="flex flex-wrap items-center gap-3 mt-4">
-                      <span className="text-sm text-muted-foreground">
-                        {exp.period}
-                      </span>
-                      <Badge
-                        variant="secondary"
-                        className="font-medium bg-primary/10 text-primary border-primary/20"
-                      >
-                        {exp.type}
-                      </Badge>
-                    </div>
+                {/* Period & Type */}
+                <div className="flex md:flex-col items-start gap-3 md:items-end md:text-right shrink-0">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Calendar className="h-4 w-4" />
+                    <span className="whitespace-nowrap">{exp.period}</span>
                   </div>
+                  <Badge
+                    variant="secondary"
+                    className="text-xs bg-primary/10 text-primary border-primary/20"
+                  >
+                    {exp.type}
+                  </Badge>
                 </div>
               </div>
+
+              {/* Subtle hover effect */}
+              <div className="absolute inset-0 rounded-2xl bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10 blur-xl" />
             </div>
           ))}
         </div>
