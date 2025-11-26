@@ -2,7 +2,15 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Github, Linkedin, Twitter, Instagram, Send, CheckCircle2, AlertCircle } from "lucide-react";
+import {
+  Github,
+  Linkedin,
+  Twitter,
+  Instagram,
+  Send,
+  CheckCircle2,
+  AlertCircle,
+} from "lucide-react";
 
 export default function Footer() {
   const [formData, setFormData] = useState({
@@ -12,7 +20,9 @@ export default function Footer() {
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
+  const [submitStatus, setSubmitStatus] = useState<
+    "idle" | "success" | "error"
+  >("idle");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,7 +36,7 @@ export default function Footer() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          access_key: process.env.NEXT_PUBLIC_WEB3FORMS_KEY || "YOUR_ACCESS_KEY_HERE",
+          access_key: process.env.WEB3FORMS_KEY,
           name: formData.name,
           email: formData.email,
           subject: formData.subject,
@@ -209,10 +219,10 @@ export default function Footer() {
                 />
               </div>
 
-              <Button 
-                type="submit" 
-                size="lg" 
-                className="w-full group" 
+              <Button
+                type="submit"
+                size="lg"
+                className="w-full group"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? (
@@ -232,13 +242,18 @@ export default function Footer() {
               {submitStatus === "success" && (
                 <div className="flex items-center gap-2 text-green-600 dark:text-green-400 text-sm">
                   <CheckCircle2 className="h-5 w-5" />
-                  <span>Message sent successfully! I'll get back to you soon.</span>
+                  <span>
+                    Message sent successfully! I'll get back to you soon.
+                  </span>
                 </div>
               )}
               {submitStatus === "error" && (
                 <div className="flex items-center gap-2 text-red-600 dark:text-red-400 text-sm">
                   <AlertCircle className="h-5 w-5" />
-                  <span>Failed to send message. Please try again or email me directly.</span>
+                  <span>
+                    Failed to send message. Please try again or email me
+                    directly.
+                  </span>
                 </div>
               )}
             </form>
