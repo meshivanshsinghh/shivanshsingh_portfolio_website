@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
-import SocialSidebar from "@/components/layout/social-sidebar";
+import Analytics from "@/components/analytics";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,8 +16,31 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Shivansh Singh - AI/ML Engineer",
-  description: "Portfolio website for Shivansh Singh - AI/ML Engineer",
+  metadataBase: new URL("https://shivanshsingh.in"),
+  title: {
+    default: "Shivansh Singh",
+    template: "%s | Shivansh Singh",
+  },
+  description:
+    "Software engineer and analytics student at Northeastern University, building ML systems and cloud infrastructure.",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://shivanshsingh.in",
+    siteName: "Shivansh Singh",
+    title: "Shivansh Singh",
+    description:
+      "Software engineer and analytics student at Northeastern University, building ML systems and cloud infrastructure.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@shivanshneu",
+    creator: "@shivanshneu",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
@@ -27,23 +49,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <div className="relative min-h-screen">
-            <SocialSidebar />
-            <Header />
-            <main>{children}</main>
-            <Footer />
-          </div>
-        </ThemeProvider>
+    <html lang="en">
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white text-foreground`}>
+        <Analytics />
+        <Header />
+        <main>{children}</main>
+        <Footer />
       </body>
     </html>
   );

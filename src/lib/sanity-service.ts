@@ -11,6 +11,9 @@ const PORTFOLIO_QUERY = `{
     title,
     slug,
     description,
+    headline,
+    techStack,
+    award,
     date,
     tags,
     link,
@@ -26,19 +29,45 @@ const PORTFOLIO_QUERY = `{
     description,
     publishedAt,
     tags,
+    seoTitle,
+    readingTime,
     coverImage
   },
-  "announcement": *[_type == "announcement"][0] {
+  "experiences": *[_type == "experience"] | order(order asc) {
     _id,
-    isActive,
-    text,
-    link,
-    linkText,
-    variant
+    company,
+    role,
+    period,
+    type,
+    location,
+    description,
+    skills,
+    order
+  },
+  "educations": *[_type == "education"] | order(order asc) {
+    _id,
+    school,
+    degree,
+    field,
+    period,
+    location,
+    gpa,
+    order
+  },
+  "awards": *[_type == "award"] | order(order asc) {
+    _id,
+    title,
+    org,
+    sponsor,
+    date,
+    note,
+    image,
+    url,
+    linkLabel,
+    order
   }
 }`;
 
-// server side fetch with nextjs caching
 export async function fetchPortfolioData(): Promise<SanityData> {
   try {
     const isDevelopment = process.env.NODE_ENV === "development";
@@ -47,17 +76,8 @@ export async function fetchPortfolioData(): Promise<SanityData> {
       PORTFOLIO_QUERY,
       {},
       isDevelopment
-        ? {
-          // Development: no caching
-          cache: "no-store",
-        }
-        : {
-          // Production: use caching
-          next: {
-            revalidate: 3600,
-            tags: ["portfolio"],
-          },
-        }
+        ? { cache: "no-store" }
+        : { next: { revalidate: 3600, tags: ["portfolio"] } }
     );
     return data;
   } catch (error) {
@@ -65,11 +85,13 @@ export async function fetchPortfolioData(): Promise<SanityData> {
     return {
       projects: [],
       blogPosts: [],
+      experiences: [],
+      educations: [],
+      awards: [],
     };
   }
 }
 
-// client side caching utilities
 export function getCachedData(): SanityData | null {
   if (typeof window === "undefined") return null;
 
@@ -78,33 +100,21 @@ export function getCachedData(): SanityData | null {
     if (!cached) return null;
 
     const { data, timestamp } = JSON.parse(cached);
-    const now = Date.now();
+    if (Date.now() - timestamp < CACHE_DURATION) return data;
 
-    // checking if cache is still valid
-    if (now - timestamp < CACHE_DURATION) {
-      return data;
-    }
-
-    // cache expired, removing it
     localStorage.removeItem(CACHE_KEY);
     return null;
-  } catch (error) {
-    console.log("Error reading cache: ", error);
+  } catch {
     return null;
   }
 }
 
 export function setCachedData(data: SanityData): void {
   if (typeof window === "undefined") return;
-
   try {
-    const cachedObject = {
-      data,
-      timestamp: Date.now(),
-    };
-    localStorage.setItem(CACHE_KEY, JSON.stringify(cachedObject));
-  } catch (error) {
-    console.error("Error setting cache: ", error);
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ data, timestamp: Date.now() }));
+  } catch {
+    // silent
   }
 }
 
