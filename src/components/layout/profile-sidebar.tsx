@@ -20,7 +20,8 @@ export default function ProfileSidebar() {
             alt="Shivansh Singh"
             fill
             className="object-cover object-top"
-            sizes="128px"
+            sizes="(max-width: 768px) 50vw, 160px"
+            quality={95}
             priority
           />
         </div>

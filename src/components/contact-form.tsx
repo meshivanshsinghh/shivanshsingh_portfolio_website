@@ -2,35 +2,24 @@
 
 import { useState } from "react";
 import { Send, CheckCircle } from "lucide-react";
-
-const ACCESS_KEY = process.env.WEB3FORMS_KEY ?? "";
+import { sendContactMessage } from "@/app/actions/contact";
 
 export default function ContactForm() {
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [errorMsg, setErrorMsg] = useState("");
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setStatus("sending");
 
-    const form = e.currentTarget;
-    const formData = new FormData(form);
-    formData.append("access_key", ACCESS_KEY);
-    formData.append("subject", "Portfolio Contact - " + formData.get("name"));
-    formData.append("from_name", "shivanshsingh.in");
+    const formData = new FormData(e.currentTarget);
+    const result = await sendContactMessage(formData);
 
-    try {
-      const res = await fetch("https://api.web3forms.com/submit", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json();
-      if (data.success) {
-        setStatus("sent");
-        form.reset();
-      } else {
-        setStatus("error");
-      }
-    } catch {
+    if (result.success) {
+      setStatus("sent");
+      (e.target as HTMLFormElement).reset();
+    } else {
+      setErrorMsg(result.error ?? "Something went wrong.");
       setStatus("error");
     }
   }
@@ -84,7 +73,7 @@ export default function ContactForm() {
         {status === "sending" ? "Sending..." : "Send message"}
       </button>
       {status === "error" && (
-        <p className="text-xs text-[#cc0000]">Something went wrong. Try emailing me directly.</p>
+        <p className="text-xs text-[#cc0000]">{errorMsg}</p>
       )}
     </form>
   );

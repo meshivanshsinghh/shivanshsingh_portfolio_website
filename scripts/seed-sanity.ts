@@ -9,7 +9,7 @@
  *   Add to .env.local:
  *     NEXT_PUBLIC_SANITY_PROJECT_ID=...
  *     NEXT_PUBLIC_SANITY_DATASET=production
- *     SANITY_DETAIL=...   ← Editor or Admin role
+ *     SANITY_DETAIL=...      ← Editor or Admin role token
  *
  * Run:
  *   npx tsx scripts/seed-sanity.ts
