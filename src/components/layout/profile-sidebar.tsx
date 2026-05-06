@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { Github, Linkedin, Twitter, Youtube, Mail, MapPin, FileText } from "lucide-react";
-import { getChannelStats } from "@/lib/youtube-channel";
 
 const socials = [
   { name: "GitHub", href: "https://github.com/meshivanshsinghh", icon: Github },
@@ -9,23 +8,19 @@ const socials = [
   { name: "YouTube", href: "https://youtube.com/@BackslashFlutter", icon: Youtube },
 ];
 
-export default async function ProfileSidebar() {
-  const ytStats = await getChannelStats();
-  const subs = ytStats?.subs ?? "13K";
-  const views = ytStats?.views ?? "1M+";
-
+export default function ProfileSidebar() {
   return (
     <aside className="w-full md:w-56 lg:w-64 shrink-0 self-start md:sticky md:top-[5.5rem]">
       <div className="space-y-5">
 
         {/* Photo — circular */}
-        <div className="w-24 h-24 rounded-full overflow-hidden bg-secondary border-2 border-border relative">
+        <div className="w-38 h-38 rounded-full overflow-hidden bg-secondary border-2 border-[#e0e0e0] relative">
           <Image
             src="/profile.jpg"
             alt="Shivansh Singh"
             fill
             className="object-cover object-top"
-            sizes="96px"
+            sizes="128px"
             priority
           />
         </div>
@@ -99,13 +94,6 @@ export default async function ProfileSidebar() {
           ))}
         </div>
 
-        {/* YouTube stats — live cached */}
-        <div className="hidden md:flex flex-col gap-0.5 border-t border-border pt-4">
-          <p className="text-xs text-muted-foreground">Building in AI/ML on YouTube</p>
-          <p className="text-xs font-semibold text-foreground">
-            {subs} subscribers · {views} views
-          </p>
-        </div>
 
       </div>
     </aside>

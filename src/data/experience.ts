@@ -27,7 +27,7 @@ export const experiences: Experience[] = [
     role: "Software Engineer",
     period: "Jul 2023 - Jan 2025",
     type: "Full-time",
-    location: "Remote – India",
+    location: "Remote - India",
     description: [
       "Built a modular social-media application for a YC-tracked startup for people trip planning alongside an offline-first SQLite storage layer across 15 schema iterations, later deployed to AWS cloud architecture.",
       "Engineered a monolithic backend API service using Kotlin and Node.js managing 40+ REST endpoints and a Firebase Cloud Messaging notification pipeline processing 500 tokens within 256MB memory limits.",

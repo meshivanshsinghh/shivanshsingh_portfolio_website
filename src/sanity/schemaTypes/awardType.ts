@@ -41,10 +41,23 @@ export const awardType = defineType({
       description: 'One sentence of context shown on the site',
     }),
     defineField({
+      name: 'image',
+      title: 'Photo / Certificate (optional)',
+      type: 'image',
+      description: 'Upload a photo from the event, a LinkedIn post screenshot, or the certificate',
+      options: { hotspot: true },
+    }),
+    defineField({
       name: 'url',
       title: 'Link (optional)',
       type: 'url',
-      description: 'Link to post, article, or credential',
+      description: 'Link to post, article, LinkedIn announcement, or credential',
+    }),
+    defineField({
+      name: 'linkLabel',
+      title: 'Link Label (optional)',
+      type: 'string',
+      description: 'Custom label for the link button, e.g. "View LinkedIn post", "See certificate". Defaults to "View"',
     }),
     defineField({
       name: 'order',
@@ -59,11 +72,13 @@ export const awardType = defineType({
       title: 'title',
       subtitle: 'org',
       date: 'date',
+      media: 'image',
     },
-    prepare({ title, subtitle, date }) {
+    prepare({ title, subtitle, date, media }) {
       return {
         title,
         subtitle: `${subtitle} - ${date}`,
+        media,
       }
     },
   },

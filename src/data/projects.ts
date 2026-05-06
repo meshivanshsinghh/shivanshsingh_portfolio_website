@@ -16,9 +16,9 @@ export const projects: Project[] = [
     id: "dermrx_agent",
     title: "DermRx Agent",
     description:
-      "Agentic clinical pipeline integrating MedSigLIP, MedGemma 4B, TxGemma 2B, and a 302K-interaction drug database — compressing cross-specialty drug interaction checks from 5–10 minute manual lookups to under 60 seconds.",
+      "Agentic clinical pipeline integrating MedSigLIP, MedGemma 4B, TxGemma 2B, and a 302K-interaction drug database - compressing cross-specialty drug interaction checks from 5-10 minute manual lookups to under 60 seconds.",
     headline:
-      "Agentic clinical pipeline compressing cross-specialty drug interaction checks from 5–10 minute manual lookups to under 60 seconds",
+      "Agentic clinical pipeline compressing cross-specialty drug interaction checks from 5-10 minute manual lookups to under 60 seconds",
     date: "Feb 2026",
     tags: ["Healthcare AI", "LLM", "RAG", "Multi-Model"],
     techStack: ["Python", "FastAPI", "Next.js 15", "PyTorch", "MedGemma 4B", "TxGemma 2B", "MedSigLIP"],
@@ -53,7 +53,7 @@ export const projects: Project[] = [
   },
   {
     id: "cmi_bfrb",
-    title: "CMI — Behavior Detection with Sensor Data",
+    title: "CMI - Behavior Detection with Sensor Data",
     description:
       "Subject-independent gesture classifier for Body-Focused Repetitive Behaviors (hair-pulling, nail-biting) from a wrist-worn IMU+ToF device. SE-1D-CNN + bidirectional GRU architecture achieving 0.7868 macro+binary F1 across 81 subjects.",
     headline:
@@ -65,7 +65,7 @@ export const projects: Project[] = [
   },
   {
     id: "reddit_pipeline",
-    title: "Reddit Data Pipeline — ETL System",
+    title: "Reddit Data Pipeline - ETL System",
     description:
       "End-to-end ETL pipeline ingesting 700+ daily posts across 14 subreddits with Kafka, Apache Airflow (6 DAGs), and multi-method anomaly detection (z-score, volume spike, TF-IDF + K-Means). Built for a Tesla data engineering interview.",
     headline:

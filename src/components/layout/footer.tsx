@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Github, Linkedin, Twitter, Youtube } from "lucide-react";
 
 const socials = [
@@ -25,6 +28,10 @@ const socials = [
 ];
 
 export default function Footer() {
+  const pathname = usePathname();
+  // Homepage has its own dark closing section that acts as the footer
+  if (pathname === "/") return null;
+
   return (
     <footer className="border-t border-border bg-white">
       <div className="max-w-5xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">

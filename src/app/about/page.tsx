@@ -32,27 +32,29 @@ export default function AboutPage() {
             Master&apos;s in Analytics (GPA 3.96, expected 2027).
           </p>
           <p>
-            My day-to-day involves leading a 30-student research team at the Feminine Intelligence
-            Agency, where we evaluate whether large language models can detect psychological
-            manipulation in relationships — using a 28-trait UNES clinical psychology framework
+            My day-to-day involves leading a 30-student research team at the{" "}
+            <Link href="/work/fia" className="font-medium underline underline-offset-2 hover:text-[#cc0000] transition-colors">
+              Feminine Intelligence Agency
+            </Link>, where we evaluate whether large language models can detect psychological
+            manipulation in relationships - using a 28-trait UNES clinical psychology framework
             with GPT-4o, Claude, and DeepSeek.
           </p>
           <p>
             Before that, I was a Software Engineer at{" "}
-            <span className="font-medium">Travlog</span> (a YC-tracked startup), where I built a
-            cross-platform social travel app from scratch — offline-first SQLite storage, AWS cloud
-            architecture, and a Node.js + Kotlin backend managing 40+ REST endpoints.
+            <Link href="/work/travlog" className="font-medium underline underline-offset-2 hover:text-[#cc0000] transition-colors">
+              Travlog
+            </Link>{" "}
+            (a YC-tracked startup), where I built a cross-platform social travel app from scratch -
+            offline-first SQLite storage, AWS cloud architecture, and a Node.js + Kotlin backend
+            managing 40+ REST endpoints.
           </p>
           <p>
-            I compete on Kaggle and build production ML systems. Recent work: a top-20% finish in
-            March Machine Learning Mania 2026 (3,000+ competitors), an agentic clinical AI pipeline
-            for Google&apos;s MedGemma Challenge, and a production RAG system deployed on AWS with
-            full observability.
+            I compete on Kaggle and build production ML systems - from agentic clinical AI pipelines
+            to production RAG systems deployed on AWS with full observability.
           </p>
           <p>
-            Outside of work, I run a YouTube channel — currently{" "}
-            <span className="font-medium">13K subscribers and 1M+ views</span> — originally about
-            Flutter development, evolving toward AI/ML systems and applied research.
+            Outside of work, I run a YouTube channel originally about Flutter development, now
+            evolving toward AI/ML systems and applied research.
           </p>
         </div>
 
@@ -61,7 +63,7 @@ export default function AboutPage() {
           {[
             { label: "Years of experience", value: "2+" },
             { label: "GPA (Northeastern)", value: "3.96" },
-            { label: "YouTube subscribers", value: "13K" },
+            { label: "Student researchers led", value: "30" },
           ].map((fact) => (
             <div key={fact.label} className="border border-border rounded p-4">
               <div className="text-xl font-semibold text-foreground mb-1">{fact.value}</div>

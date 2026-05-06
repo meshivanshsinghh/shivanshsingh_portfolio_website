@@ -65,7 +65,9 @@ export interface SanityAward {
   sponsor?: string;
   date: string;
   note?: string;
+  image?: { asset: { _ref: string; _type: string }; hotspot?: unknown };
   url?: string;
+  linkLabel?: string;
   order: number;
 }
 

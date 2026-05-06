@@ -61,7 +61,9 @@ const PORTFOLIO_QUERY = `{
     sponsor,
     date,
     note,
+    image,
     url,
+    linkLabel,
     order
   }
 }`;

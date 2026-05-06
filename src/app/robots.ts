@@ -5,6 +5,9 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
+        // Allow crawling everywhere so Google can follow links to blog posts.
+        // Individual non-blog pages declare <meta name="robots" content="noindex">
+        // via their layout.tsx files — that controls indexing, not this file.
         allow: "/",
         disallow: ["/studio/", "/api/"],
       },
