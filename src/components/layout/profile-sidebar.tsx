@@ -16,7 +16,7 @@ export default function ProfileSidebar() {
         {/* Photo — circular */}
         <div className="w-38 h-38 rounded-full overflow-hidden bg-secondary border-2 border-[#e0e0e0] relative">
           <Image
-            src="/profile.jpg"
+            src="/gpt_image.png"
             alt="Shivansh Singh"
             fill
             className="object-cover object-top"

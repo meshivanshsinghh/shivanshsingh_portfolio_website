@@ -9,7 +9,7 @@
  *   Add to .env.local:
  *     NEXT_PUBLIC_SANITY_PROJECT_ID=...
  *     NEXT_PUBLIC_SANITY_DATASET=production
- *     SANITY_API_TOKEN=...   ← Editor or Admin role
+ *     SANITY_DETAIL=...   ← Editor or Admin role
  *
  * Run:
  *   npx tsx scripts/seed-sanity.ts
@@ -25,7 +25,7 @@ const client = createClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET ?? "production",
   apiVersion: "2025-11-09",
-  token: process.env.SANITY_API_TOKEN,
+  token: process.env.SANITY_DETAIL,
   useCdn: false,
 });
 

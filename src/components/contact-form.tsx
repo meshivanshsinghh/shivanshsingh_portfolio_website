@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Send, CheckCircle } from "lucide-react";
 
-const ACCESS_KEY = process.env.NEXT_PUBLIC_WEB3FORMS_KEY ?? "";
+const ACCESS_KEY = process.env.WEB3FORMS_KEY ?? "";
 
 export default function ContactForm() {
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");

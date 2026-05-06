@@ -221,7 +221,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             <div className="flex items-center gap-3">
               <div className="relative h-10 w-10 rounded-full overflow-hidden border border-border shrink-0">
                 <Image
-                  src="/profile.jpg"
+                  src="/gpt_image.png"
                   alt="Shivansh Singh"
                   fill
                   className="object-cover object-top"
