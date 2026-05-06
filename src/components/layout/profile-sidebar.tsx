@@ -1,38 +1,33 @@
+import Image from "next/image";
 import { Github, Linkedin, Twitter, Youtube, Mail, MapPin, FileText } from "lucide-react";
+import { getChannelStats } from "@/lib/youtube-channel";
 
 const socials = [
-  {
-    name: "GitHub",
-    href: "https://github.com/meshivanshsinghh",
-    icon: Github,
-  },
-  {
-    name: "LinkedIn",
-    href: "https://linkedin.com/in/shivanshsinghh",
-    icon: Linkedin,
-  },
-  {
-    name: "Twitter / X",
-    href: "https://x.com/shivanshneu",
-    icon: Twitter,
-  },
-  {
-    name: "YouTube",
-    href: "https://youtube.com/@BackslashFlutter",
-    icon: Youtube,
-  },
+  { name: "GitHub", href: "https://github.com/meshivanshsinghh", icon: Github },
+  { name: "LinkedIn", href: "https://linkedin.com/in/shivanshsinghh", icon: Linkedin },
+  { name: "Twitter / X", href: "https://x.com/shivanshneu", icon: Twitter },
+  { name: "YouTube", href: "https://youtube.com/@BackslashFlutter", icon: Youtube },
 ];
 
-export default function ProfileSidebar() {
+export default async function ProfileSidebar() {
+  const ytStats = await getChannelStats();
+  const subs = ytStats?.subs ?? "13K";
+  const views = ytStats?.views ?? "1M+";
+
   return (
-    <aside className="w-full md:w-56 lg:w-64 shrink-0">
-      <div className="md:sticky md:top-20 space-y-5">
-        {/* Photo */}
-        <div className="w-36 h-36 md:w-full md:h-auto md:aspect-square rounded-md overflow-hidden bg-secondary border border-border">
-          {/* Photo placeholder — replace src when you have a photo */}
-          <div className="w-full h-full flex items-center justify-center bg-[#f5f5f5]">
-            <span className="text-4xl font-bold text-muted-foreground select-none">SS</span>
-          </div>
+    <aside className="w-full md:w-56 lg:w-64 shrink-0 self-start md:sticky md:top-[5.5rem]">
+      <div className="space-y-5">
+
+        {/* Photo — circular */}
+        <div className="w-24 h-24 rounded-full overflow-hidden bg-secondary border-2 border-border relative">
+          <Image
+            src="/profile.jpg"
+            alt="Shivansh Singh"
+            fill
+            className="object-cover object-top"
+            sizes="96px"
+            priority
+          />
         </div>
 
         {/* Name & role */}
@@ -52,7 +47,7 @@ export default function ProfileSidebar() {
             <span className="text-foreground font-medium">Northeastern University</span>
           </div>
           <p className="text-xs text-muted-foreground pl-3">
-            M.S. Analytics, 2025–2027
+            M.S. Analytics, Apr 2025 - Dec 2026
           </p>
           <div className="flex items-center gap-1.5 text-xs pl-3 text-muted-foreground">
             <MapPin className="h-3 w-3 shrink-0" />
@@ -104,12 +99,14 @@ export default function ProfileSidebar() {
           ))}
         </div>
 
-        {/* YouTube note */}
-        <div className="hidden md:block text-xs text-muted-foreground border-t border-border pt-4">
-          Building in AI/ML on YouTube
-          <br />
-          <span className="text-foreground font-medium">13K subscribers · 1M+ views</span>
+        {/* YouTube stats — live cached */}
+        <div className="hidden md:flex flex-col gap-0.5 border-t border-border pt-4">
+          <p className="text-xs text-muted-foreground">Building in AI/ML on YouTube</p>
+          <p className="text-xs font-semibold text-foreground">
+            {subs} subscribers · {views} views
+          </p>
         </div>
+
       </div>
     </aside>
   );

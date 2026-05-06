@@ -97,6 +97,21 @@ export const postType = defineType({
       validation: (Rule) => Rule.required(),
       group: 'meta',
     }),
+    defineField({
+      name: 'seoTitle',
+      title: 'SEO Title (optional)',
+      type: 'string',
+      description: 'Overrides the page <title> tag for search engines. Leave blank to use the post title.',
+      validation: (Rule) => Rule.max(60),
+      group: 'meta',
+    }),
+    defineField({
+      name: 'readingTime',
+      title: 'Reading Time (minutes, optional)',
+      type: 'number',
+      description: 'Estimated reading time. Leave blank for auto-calculation.',
+      group: 'meta',
+    }),
   ],
   preview: {
     select: {

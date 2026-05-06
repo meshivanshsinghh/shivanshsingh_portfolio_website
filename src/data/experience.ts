@@ -12,7 +12,7 @@ export const experiences: Experience[] = [
   {
     company: "Feminine Intelligence Agency (FIA)",
     role: "Tech Lead",
-    period: "Jan 2026 – Present",
+    period: "Jan 2026 - Present",
     type: "Contract",
     location: "Boston, MA",
     description: [
@@ -25,7 +25,7 @@ export const experiences: Experience[] = [
   {
     company: "Travlog",
     role: "Software Engineer",
-    period: "Jul 2023 – Jan 2025",
+    period: "Jul 2023 - Jan 2025",
     type: "Full-time",
     location: "Remote – India",
     description: [

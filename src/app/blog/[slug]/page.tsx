@@ -1,10 +1,12 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { Metadata } from "next";
 import { client } from "@/lib/sanity";
 import { urlFor } from "@/lib/sanity";
 import { PortableText } from "@portabletext/react";
 import { ArrowLeft, Calendar, Clock } from "lucide-react";
+import BlogViewTracker from "@/components/blog-view-tracker";
 
 interface BlogPostPageProps {
   params: Promise<{ slug: string }>;
@@ -17,6 +19,8 @@ const POST_QUERY = `*[_type == "post" && slug.current == $slug][0]{
   description,
   publishedAt,
   tags,
+  seoTitle,
+  readingTime,
   coverImage,
   body,
   author->{
@@ -33,6 +37,43 @@ async function getPost(slug: string) {
   }
 }
 
+export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const post = await getPost(slug);
+  if (!post) return {};
+
+  const title = post.seoTitle ?? post.title;
+  let coverImageUrl: string | undefined;
+  if (post.coverImage?.asset) {
+    try {
+      coverImageUrl = urlFor(post.coverImage).width(1200).height(630).url();
+    } catch {
+      coverImageUrl = undefined;
+    }
+  }
+
+  return {
+    title,
+    description: post.description,
+    openGraph: {
+      title,
+      description: post.description,
+      type: "article",
+      publishedTime: post.publishedAt,
+      authors: ["Shivansh Singh"],
+      ...(coverImageUrl && {
+        images: [{ url: coverImageUrl, width: 1200, height: 630, alt: post.title }],
+      }),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description: post.description,
+      ...(coverImageUrl && { images: [coverImageUrl] }),
+    },
+  };
+}
+
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { slug } = await params;
   const post = await getPost(slug);
@@ -45,8 +86,38 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     year: "numeric",
   });
 
+  let coverImageUrl: string | undefined;
+  if (post.coverImage?.asset) {
+    try {
+      coverImageUrl = urlFor(post.coverImage).width(1200).height(630).url();
+    } catch {
+      coverImageUrl = undefined;
+    }
+  }
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    description: post.description ?? "",
+    author: { "@type": "Person", name: "Shivansh Singh", url: "https://shivanshsingh.in" },
+    datePublished: post.publishedAt,
+    ...(coverImageUrl && { image: coverImageUrl }),
+    url: `https://shivanshsingh.in/blog/${slug}`,
+    publisher: {
+      "@type": "Person",
+      name: "Shivansh Singh",
+      url: "https://shivanshsingh.in",
+    },
+  };
+
   return (
     <div className="max-w-5xl mx-auto px-6 py-10 md:py-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <BlogViewTracker slug={slug} title={post.title} />
       {/* Back */}
       <Link
         href="/blog"

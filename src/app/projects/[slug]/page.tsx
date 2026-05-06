@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { Metadata } from "next";
 import { client } from "@/lib/sanity";
 import { urlFor } from "@/lib/sanity";
 import { PortableText } from "@portabletext/react";
@@ -16,9 +17,12 @@ const PROJECT_QUERY = `*[_type == "project" && slug.current == $slug][0]{
   title,
   slug,
   description,
+  headline,
   overview,
   date,
   tags,
+  techStack,
+  award,
   technologies,
   features,
   link,
@@ -35,6 +39,40 @@ async function getProject(slug: string) {
   } catch {
     return null;
   }
+}
+
+export async function generateMetadata({ params }: ProjectPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const project = await getProject(slug);
+  if (!project) return {};
+
+  let coverImageUrl: string | undefined;
+  if (project.coverImage?.asset) {
+    try {
+      coverImageUrl = urlFor(project.coverImage).width(1200).height(630).url();
+    } catch {
+      coverImageUrl = undefined;
+    }
+  }
+
+  return {
+    title: project.title,
+    description: project.description,
+    openGraph: {
+      title: project.title,
+      description: project.description,
+      type: "article",
+      ...(coverImageUrl && {
+        images: [{ url: coverImageUrl, width: 1200, height: 630, alt: project.title }],
+      }),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: project.title,
+      description: project.description,
+      ...(coverImageUrl && { images: [coverImageUrl] }),
+    },
+  };
 }
 
 export default async function ProjectPage({ params }: ProjectPageProps) {

@@ -4,7 +4,6 @@ export interface Education {
   field: string;
   period: string;
   location?: string;
-  logo?: string;
   gpa?: string;
 }
 
@@ -13,16 +12,23 @@ export const education: Education[] = [
     school: "Northeastern University",
     degree: "Master's degree",
     field: "Analytics",
-    period: "Apr 2025 - Jul 2027",
+    period: "Apr 2025 - Dec 2026",
     location: "Boston, Massachusetts, United States",
-    gpa: "4.0",
+    gpa: "3.96",
   },
   {
     school: "International Institute of Information Technology Bangalore",
     degree: "PG Diploma",
     field: "Data Science",
-    period: "2023 - 2024",
+    period: "May 2024 - Jan 2025",
     location: "Bangalore, India",
     gpa: "3.7",
+  },
+  {
+    school: "University of Lucknow",
+    degree: "Bachelor of Business Administration",
+    field: "International Business",
+    period: "2020 - 2023",
+    location: "Lucknow, India",
   },
 ];
