@@ -2,272 +2,199 @@
 
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import { ArrowLeft, Search, Filter, Folder, Github, ExternalLink, Calendar } from "lucide-react";
-import { projects as fallbackProjects } from "@/data/projects";
-import { Button } from "@/components/ui/button";
+import { ArrowLeft, ExternalLink, Search } from "lucide-react";
+import { projects as staticProjects } from "@/data/projects";
 import { SanityProject } from "@/types/sanity";
-import { urlFor } from "@/lib/sanity";
 import { getCachedData } from "@/lib/sanity-service";
 
-export default function ProjectsArchivePage() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedTag, setSelectedTag] = useState<string | null>(null);
-  const [projects, setProjects] = useState<SanityProject[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+const ALL_ROLES = [
+  "All",
+  "MLE",
+  "Applied Scientist",
+  "Data Engineer",
+  "Data Science",
+  "AI Engineer",
+  "Backend SWE",
+  "Full-Stack SWE",
+  "Analytics Engineer",
+];
 
-  // Fetch projects from cache or use fallback
-  useEffect(() => {
-    const cachedData = getCachedData();
-    if (cachedData?.projects && cachedData.projects.length > 0) {
-      setProjects(cachedData.projects);
-    }
-    setIsLoading(false);
-  }, []);
-
-  // Use Sanity projects if available, otherwise fallback
-  const projectsData: SanityProject[] = projects.length > 0 ? projects : fallbackProjects.map((p, i) => ({
-    _id: `fallback-${i}`,
+function toSanityShape(p: (typeof staticProjects)[number]): SanityProject & { headline: string; techStack: string[]; award?: string } {
+  return {
+    _id: p.id,
     _createdAt: new Date().toISOString(),
     title: p.title,
-    slug: { current: p.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") },
+    slug: { current: p.id },
     description: p.description,
     date: p.date,
-    tags: p.tags || [],
-    link: p.link,
-    githubUrl: undefined,
+    tags: p.tags,
     featured: p.featured,
     coverImage: undefined,
-  }));
+    link: p.link,
+    githubUrl: undefined,
+    headline: p.headline,
+    techStack: p.techStack,
+    award: p.award,
+  };
+}
 
-  // Get all unique tags
-  const allTags = useMemo(() => {
-    const tags = new Set<string>();
-    projectsData.forEach(project => {
-      project.tags?.forEach(tag => tags.add(tag));
-    });
-    return Array.from(tags).sort();
-  }, [projectsData]);
+const projectRoleMap: Record<string, string[]> = {
+  dermrx_agent: ["MLE", "Applied Scientist", "AI Engineer", "Full-Stack SWE"],
+  ncaa: ["MLE", "Applied Scientist", "Data Science"],
+  rag_qa_system: ["MLE", "AI Engineer", "Backend SWE", "Full-Stack SWE"],
+  cmi_bfrb: ["MLE", "Applied Scientist", "Data Science"],
+  reddit_pipeline: ["Data Engineer", "Backend SWE", "Analytics Engineer"],
+  credit_risk: ["Data Science", "Analytics Engineer"],
+};
 
-  // Filter projects
-  const filteredProjects = useMemo(() => {
-    return projectsData.filter(project => {
-      const matchesSearch = project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           project.description.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesTag = !selectedTag || project.tags?.includes(selectedTag);
-      return matchesSearch && matchesTag;
+export default function ProjectsPage() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedRole, setSelectedRole] = useState("All");
+  const [sanityProjects, setSanityProjects] = useState<SanityProject[]>([]);
+
+  useEffect(() => {
+    const cached = getCachedData();
+    if (cached?.projects && cached.projects.length > 0) {
+      setSanityProjects(cached.projects);
+    }
+  }, []);
+
+  const projectsData = useMemo(() => {
+    if (sanityProjects.length > 0) return sanityProjects;
+    return staticProjects.map(toSanityShape);
+  }, [sanityProjects]);
+
+  const filtered = useMemo(() => {
+    return projectsData.filter((p) => {
+      const matchesSearch =
+        p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesRole =
+        selectedRole === "All" ||
+        (projectRoleMap[p._id]?.includes(selectedRole) ?? false);
+      return matchesSearch && matchesRole;
     });
-  }, [searchQuery, selectedTag, projectsData]);
+  }, [projectsData, searchQuery, selectedRole]);
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Animated Background */}
-      <div className="fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute top-20 right-10 w-96 h-96 bg-primary/10 rounded-full blur-3xl opacity-20 animate-pulse" />
-        <div className="absolute bottom-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl opacity-20 animate-pulse delay-1000" />
+    <div className="max-w-5xl mx-auto px-6 py-10 md:py-16">
+      {/* Page header */}
+      <div className="mb-10">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors mb-6"
+        >
+          <ArrowLeft className="h-3 w-3" />
+          Back
+        </Link>
+        <h1 className="text-2xl font-semibold text-foreground mb-2">Projects</h1>
+        <p className="text-sm text-muted-foreground">
+          {staticProjects.length} projects — ranging from Kaggle competitions to production ML systems.
+        </p>
       </div>
 
-      {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl">
-        <div className="container flex h-16 items-center max-w-7xl mx-auto px-4">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+      {/* Search */}
+      <div className="relative mb-6 max-w-sm">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+        <input
+          type="text"
+          placeholder="Search projects..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full pl-9 pr-4 py-2 text-sm border border-border rounded bg-white focus:outline-none focus:ring-1 focus:ring-ring placeholder:text-muted-foreground"
+        />
+      </div>
+
+      {/* Role filters */}
+      <div className="flex flex-wrap gap-2 mb-10">
+        {ALL_ROLES.map((role) => (
+          <button
+            key={role}
+            onClick={() => setSelectedRole(role)}
+            className={`text-xs px-3 py-1.5 rounded border transition-colors ${
+              selectedRole === role
+                ? "bg-foreground text-white border-foreground"
+                : "bg-white text-muted-foreground border-border hover:border-foreground hover:text-foreground"
+            }`}
           >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Home
-          </Link>
-        </div>
-      </header>
+            {role}
+          </button>
+        ))}
+      </div>
 
-      {/* Main Content */}
-      <section className="py-20">
-        <div className="container max-w-7xl mx-auto px-6 sm:px-8 md:px-12 lg:px-4">
-          {/* Page Header */}
-          <div className="mb-12">
-            <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-4">
-              All <span className="text-primary">Projects</span>
-            </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl">
-              A collection of {fallbackProjects.length} projects I've worked on, ranging from AI/ML systems to full-stack applications.
-            </p>
-          </div>
+      {/* Count */}
+      <p className="text-xs text-muted-foreground mb-6">
+        {filtered.length} of {projectsData.length} projects
+      </p>
 
-          {/* Search and Filter */}
-          <div className="mb-12 space-y-6">
-            {/* Search Bar */}
-            <div className="relative max-w-md">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <input
-                type="text"
-                placeholder="Search projects..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 rounded-xl bg-card/50 border border-border/50 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-              />
-            </div>
-
-            {/* Tag Filter */}
-            <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => setSelectedTag(null)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                  !selectedTag
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-card/30 text-muted-foreground hover:bg-card/50"
-                }`}
-              >
-                All
-              </button>
-              {allTags.map(tag => (
-                <button
-                  key={tag}
-                  onClick={() => setSelectedTag(tag)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    selectedTag === tag
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-card/30 text-muted-foreground hover:bg-card/50"
-                  }`}
-                >
-                  {tag}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Results Count */}
-          <div className="mb-6 text-sm text-muted-foreground">
-            Showing {filteredProjects.length} of {projectsData.length} projects
-          </div>
-
-          {/* Projects Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredProjects.map((project, index) => {
-              const slug = project.slug.current;
-              
-              // Get image URL if available
-              let imageUrl: string | undefined;
-              if (project.coverImage?.asset) {
-                try {
-                  imageUrl = urlFor(project.coverImage).width(600).height(400).url();
-                } catch (error) {
-                  console.error("Error generating image URL:", error);
-                }
-              }
-              
-              return (
-              <Link
-                key={project._id}
-                href={`/projects/${slug}`}
-                className="group relative bg-card/30 backdrop-blur-sm border border-border/50 rounded-2xl overflow-hidden hover:bg-card/50 hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 flex flex-col"
-              >
-                {/* Featured Image */}
-                {imageUrl ? (
-                  <div className="relative h-48 overflow-hidden bg-muted">
-                    <Image
-                      src={imageUrl}
-                      alt={project.title}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
-                  </div>
-                ) : (
-                  <div className="relative h-48 bg-gradient-to-br from-primary/20 via-primary/10 to-background flex items-center justify-center">
-                    <Folder className="h-16 w-16 text-primary/30" />
-                  </div>
-                )}
-
-                {/* Content */}
-                <div className="p-6 flex flex-col flex-grow">
-                  {/* Header with Links */}
-                  <div className="flex items-start justify-between mb-3">
-                    <h3 className="text-xl font-bold group-hover:text-primary transition-colors flex-1 line-clamp-2">
+      {/* Projects list */}
+      <div className="space-y-0 divide-y divide-border">
+        {filtered.map((project) => {
+          const extended = project as typeof project & { headline?: string; techStack?: string[]; award?: string };
+          return (
+            <div key={project._id} className="py-6">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                    <Link
+                      href={`/projects/${project.slug.current}`}
+                      className="text-sm font-semibold text-foreground hover:text-accent transition-colors"
+                    >
                       {project.title}
-                    </h3>
-                    <div className="flex gap-2 ml-2">
-                      {project.githubUrl && (
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            window.open(project.githubUrl, '_blank', 'noopener,noreferrer');
-                          }}
-                          className="p-2 rounded-lg text-muted-foreground hover:text-primary transition-all hover:scale-110"
-                          aria-label="View on GitHub"
-                        >
-                          <Github className="h-4 w-4" />
-                        </button>
-                      )}
-                      {project.link && (
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            window.open(project.link, '_blank', 'noopener,noreferrer');
-                          }}
-                          className="p-2 rounded-lg text-muted-foreground hover:text-primary transition-all hover:scale-110"
-                          aria-label="View live demo"
-                        >
-                          <ExternalLink className="h-4 w-4" />
-                        </button>
-                      )}
-                    </div>
+                    </Link>
+                    {extended.award && (
+                      <span className="text-xs text-[#cc0000] font-medium">
+                        {extended.award}
+                      </span>
+                    )}
                   </div>
-
-                  <p className="text-sm text-muted-foreground leading-relaxed mb-4 flex-grow line-clamp-3">
-                    {project.description}
+                  <p className="text-sm text-muted-foreground leading-relaxed mb-3">
+                    {extended.headline ?? project.description}
                   </p>
-
-                  {/* Footer */}
-                  <div className="space-y-3 mt-auto">
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <Calendar className="h-3 w-3" />
-                      {project.date}
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {project.tags?.slice(0, 3).map((tag) => (
-                        <span
-                          key={tag}
-                          className="text-xs px-2 py-1 rounded-md bg-primary/10 text-primary border border-primary/20"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {(extended.techStack ?? project.tags ?? []).slice(0, 6).map((t) => (
+                      <span
+                        key={t}
+                        className="text-xs px-2 py-0.5 bg-secondary text-muted-foreground border border-border rounded"
+                      >
+                        {t}
+                      </span>
+                    ))}
                   </div>
                 </div>
-
-                {/* Hover glow */}
-                <div className="absolute inset-0 rounded-2xl bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10 blur-xl" />
-              </Link>
-            );
-            })}
-          </div>
-
-          {/* Empty State */}
-          {filteredProjects.length === 0 && (
-            <div className="text-center py-20">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted/50 mb-4">
-                <Search className="h-8 w-8 text-muted-foreground" />
+                <div className="flex items-center gap-2 shrink-0 pt-0.5">
+                  <span className="text-xs text-muted-foreground whitespace-nowrap">
+                    {project.date}
+                  </span>
+                  {project.link && (
+                    <a
+                      href={project.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`Visit ${project.title}`}
+                      className="text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <ExternalLink className="h-3.5 w-3.5" />
+                    </a>
+                  )}
+                </div>
               </div>
-              <h3 className="text-xl font-bold mb-2">No projects found</h3>
-              <p className="text-muted-foreground mb-6">
-                Try adjusting your search or filter criteria
-              </p>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setSearchQuery("");
-                  setSelectedTag(null);
-                }}
-              >
-                Clear filters
-              </Button>
             </div>
-          )}
+          );
+        })}
+      </div>
+
+      {filtered.length === 0 && (
+        <div className="py-16 text-center">
+          <p className="text-sm text-muted-foreground mb-3">No projects match your filters.</p>
+          <button
+            onClick={() => { setSearchQuery(""); setSelectedRole("All"); }}
+            className="text-xs text-foreground underline underline-offset-2"
+          >
+            Clear filters
+          </button>
         </div>
-      </section>
+      )}
     </div>
   );
 }

@@ -4,14 +4,11 @@ import Link from "next/link";
 import { client } from "@/lib/sanity";
 import { urlFor } from "@/lib/sanity";
 import { PortableText } from "@portabletext/react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { ArrowLeft, ExternalLink, Github } from "lucide-react";
+import { projects as staticProjects } from "@/data/projects";
 
 interface ProjectPageProps {
-    params: Promise<{
-        slug: string;
-    }>;
+  params: Promise<{ slug: string }>;
 }
 
 const PROJECT_QUERY = `*[_type == "project" && slug.current == $slug][0]{
@@ -33,224 +30,247 @@ const PROJECT_QUERY = `*[_type == "project" && slug.current == $slug][0]{
 }`;
 
 async function getProject(slug: string) {
-    const project = await client.fetch(PROJECT_QUERY, { slug });
-    return project;
+  try {
+    return await client.fetch(PROJECT_QUERY, { slug });
+  } catch {
+    return null;
+  }
 }
 
 export default async function ProjectPage({ params }: ProjectPageProps) {
+  const { slug } = await params;
+  let project = await getProject(slug);
 
-    const { slug } = await params;
-    const project = await getProject(slug);
+  // Fallback to static data
+  if (!project) {
+    const staticMatch = staticProjects.find((p) => p.id === slug);
+    if (!staticMatch) notFound();
+    project = {
+      _id: staticMatch.id,
+      title: staticMatch.title,
+      slug: { current: staticMatch.id },
+      description: staticMatch.description,
+      overview: staticMatch.description,
+      date: staticMatch.date,
+      tags: staticMatch.tags,
+      technologies: staticMatch.techStack.map((t) => ({ name: t })),
+      features: [],
+      link: staticMatch.link ?? null,
+      githubUrl: null,
+      coverImage: null,
+      gallery: [],
+      body: null,
+      featured: staticMatch.featured,
+    };
+  }
 
-    if (!project) {
-        notFound();
-    }
+  return (
+    <div className="max-w-5xl mx-auto px-6 py-10 md:py-16">
+      {/* Back */}
+      <Link
+        href="/projects"
+        className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors mb-8"
+      >
+        <ArrowLeft className="h-3 w-3" />
+        All projects
+      </Link>
 
-    return (
-        <div className="min-h-screen bg-background">
-            {/* Header */}
-            <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-                <div className="container flex h-16 items-center justify-between max-w-6xl mx-auto px-4">
-                    <Link
-                        href="/"
-                        className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                        <ArrowLeft className="h-4 w-4" />
-                        Back to Home
-                    </Link>
-                    <div className="flex gap-3">
-                        {project.link && (
-                            <Button variant="outline" size="sm" asChild>
-                                <a href={project.link} target="_blank" rel="noopener noreferrer">
-                                    <ExternalLink className="h-4 w-4 mr-2" />
-                                    Live URL
-                                </a>
-                            </Button>
-                        )}
-                        {project.githubUrl && (
-                            <Button variant="outline" size="sm" asChild>
-                                <a
-                                    href={project.githubUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    <Github className="h-4 w-4 mr-2" />
-                                    GitHub
-                                </a>
-                            </Button>
-                        )}
-                    </div>
-                </div>
-            </header>
-
-            {/* Hero Section */}
-            <section className="py-20 border-b border-border/40">
-                <div className="container max-w-6xl mx-auto px-4">
-                    <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
-                        {project.title}
-                    </h1>
-                    <p className="text-xl text-muted-foreground max-w-3xl">
-                        {project.description}
-                    </p>
-                    <div className="flex flex-wrap gap-2 mt-6">
-                        {project.tags?.map((tag: string) => (
-                            <Badge
-                                key={tag}
-                                variant="secondary"
-                                className="text-sm bg-primary/10 text-primary border-primary/20"
-                            >
-                                {tag}
-                            </Badge>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* Cover Image */}
-            {project.coverImage && (
-                <section className="py-12 border-b border-border/40">
-                    <div className="container max-w-5xl mx-auto px-4">
-                        <div className="relative aspect-video rounded-2xl overflow-hidden border border-border/40 shadow-2xl">
-                            <Image
-                                src={urlFor(project.coverImage).width(1200).height(675).url()}
-                                alt={project.title}
-                                fill
-                                className="object-cover"
-                                priority
-                            />
-                        </div>
-                    </div>
-                </section>
+      {/* Header */}
+      <div className="mb-8 pb-8 border-b border-border">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl font-semibold text-foreground mb-2 leading-snug">
+              {project.title}
+            </h1>
+            <p className="text-sm text-muted-foreground leading-relaxed max-w-2xl">
+              {project.description}
+            </p>
+            {project.date && (
+              <p className="text-xs text-muted-foreground mt-3">{project.date}</p>
             )}
-
-            {/* Overview */}
-            {project.overview && (
-                <section className="py-16 border-b border-border/40">
-                    <div className="container max-w-4xl mx-auto px-4">
-                        <h2 className="text-3xl font-bold mb-6">Overview</h2>
-                        <p className="text-lg text-muted-foreground leading-relaxed whitespace-pre-line">
-                            {project.overview}
-                        </p>
-                    </div>
-                </section>
+          </div>
+          <div className="flex gap-2 shrink-0 pt-1">
+            {project.link && (
+              <a
+                href={project.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs border border-border rounded px-3 py-1.5 text-muted-foreground hover:text-foreground hover:border-foreground transition-colors"
+              >
+                <ExternalLink className="h-3 w-3" />
+                Live URL
+              </a>
             )}
-
-            {/* Technologies */}
-            {project.technologies && project.technologies.length > 0 && (
-                <section className="py-16 border-b border-border/40">
-                    <div className="container max-w-4xl mx-auto px-4">
-                        <h2 className="text-3xl font-bold mb-6">Technologies</h2>
-                        <ul className="space-y-3">
-                            {project.technologies.map((tech: any, index: number) => (
-                                <li key={index} className="flex items-center gap-2">
-                                    <span className="text-primary">▸</span>
-                                    {tech.url ? (
-                                        <a
-                                            href={tech.url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-lg text-foreground hover:text-primary transition-colors"
-                                        >
-                                            {tech.name}
-                                        </a>
-                                    ) : (
-                                        <span className="text-lg">{tech.name}</span>
-                                    )}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                </section>
+            {project.githubUrl && (
+              <a
+                href={project.githubUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs border border-border rounded px-3 py-1.5 text-muted-foreground hover:text-foreground hover:border-foreground transition-colors"
+              >
+                <Github className="h-3 w-3" />
+                GitHub
+              </a>
             )}
-
-            {/* Features */}
-            {project.features && project.features.length > 0 && (
-                <section className="py-16 border-b border-border/40">
-                    <div className="container max-w-4xl mx-auto px-4">
-                        <h2 className="text-3xl font-bold mb-6">Features</h2>
-                        <ul className="space-y-3">
-                            {project.features.map((feature: string, index: number) => (
-                                <li key={index} className="flex items-start gap-3">
-                                    <span className="text-primary mt-1">▸</span>
-                                    <span className="text-lg text-muted-foreground flex-1">
-                                        {feature}
-                                    </span>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                </section>
-            )}
-
-            {/* Gallery */}
-            {project.gallery && project.gallery.length > 0 && (
-                <section className="py-16 border-b border-border/40">
-                    <div className="container max-w-5xl mx-auto px-4">
-                        <div className="grid md:grid-cols-2 gap-6">
-                            {project.gallery.map((image: any, index: number) => (
-                                <div
-                                    key={index}
-                                    className="relative aspect-video rounded-xl overflow-hidden border border-border/40"
-                                >
-                                    <Image
-                                        src={urlFor(image).width(800).height(450).url()}
-                                        alt={image.alt || `Gallery image ${index + 1}`}
-                                        fill
-                                        className="object-cover"
-                                    />
-                                    {image.caption && (
-                                        <div className="absolute bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-sm">
-                                            <p className="text-sm text-muted-foreground">
-                                                {image.caption}
-                                            </p>
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-            )}
-
-            {/* Detailed Content */}
-            {project.body && (
-                <section className="py-16">
-                    <div className="container max-w-4xl mx-auto px-4">
-                        <div className="prose prose-neutral dark:prose-invert max-w-none">
-                            <PortableText value={project.body} />
-                        </div>
-                    </div>
-                </section>
-            )}
-
-            {/* Footer CTA */}
-            <section className="py-16 border-t border-border/40">
-                <div className="container max-w-4xl mx-auto px-4 text-center">
-                    <h3 className="text-2xl font-bold mb-6">Interested in this project?</h3>
-                    <div className="flex justify-center gap-4">
-                        {project.link && (
-                            <Button size="lg" asChild>
-                                <a href={project.link} target="_blank" rel="noopener noreferrer">
-                                    <ExternalLink className="h-4 w-4 mr-2" />
-                                    Visit Live Site
-                                </a>
-                            </Button>
-                        )}
-                        {project.githubUrl && (
-                            <Button size="lg" variant="outline" asChild>
-                                <a
-                                    href={project.githubUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    <Github className="h-4 w-4 mr-2" />
-                                    View Source Code
-                                </a>
-                            </Button>
-                        )}
-                    </div>
-                </div>
-            </section>
+          </div>
         </div>
-    );
+
+        {/* Tags */}
+        {project.tags && project.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mt-4">
+            {project.tags.map((tag: string) => (
+              <span
+                key={tag}
+                className="text-xs px-2 py-0.5 bg-secondary text-muted-foreground border border-border rounded"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Cover Image */}
+      {project.coverImage && (
+        <div className="relative aspect-video rounded border border-border overflow-hidden mb-10">
+          <Image
+            src={urlFor(project.coverImage).width(1200).height(675).url()}
+            alt={project.title}
+            fill
+            className="object-cover"
+            priority
+          />
+        </div>
+      )}
+
+      {/* Two-column layout for overview + metadata */}
+      <div className="grid md:grid-cols-[1fr_220px] gap-12">
+        {/* Left: main content */}
+        <div className="space-y-10">
+          {project.overview && (
+            <section>
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-4">
+                Overview
+              </h2>
+              <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">
+                {project.overview}
+              </p>
+            </section>
+          )}
+
+          {project.features && project.features.length > 0 && (
+            <section>
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-4">
+                Key Details
+              </h2>
+              <ul className="space-y-2">
+                {project.features.map((feature: string, i: number) => (
+                  <li key={i} className="flex gap-3 text-sm text-foreground">
+                    <span className="text-[#cc0000] shrink-0 mt-0.5">·</span>
+                    <span className="leading-relaxed">{feature}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {/* Portable Text body */}
+          {project.body && (
+            <section>
+              <div className="prose prose-sm prose-neutral max-w-none text-foreground
+                prose-headings:font-semibold prose-headings:text-foreground
+                prose-a:text-[#cc0000] prose-a:no-underline hover:prose-a:underline
+                prose-code:text-foreground prose-code:bg-secondary prose-code:px-1 prose-code:rounded
+                prose-pre:bg-secondary prose-pre:border prose-pre:border-border">
+                <PortableText value={project.body} />
+              </div>
+            </section>
+          )}
+        </div>
+
+        {/* Right: metadata sidebar */}
+        <aside className="space-y-6">
+          {project.technologies && project.technologies.length > 0 && (
+            <div>
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+                Technologies
+              </h3>
+              <ul className="space-y-1.5">
+                {project.technologies.map((tech: { name: string; url?: string }, i: number) => (
+                  <li key={i} className="text-sm text-foreground">
+                    {tech.url ? (
+                      <a
+                        href={tech.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-accent transition-colors hover:underline underline-offset-2"
+                      >
+                        {tech.name}
+                      </a>
+                    ) : (
+                      tech.name
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </aside>
+      </div>
+
+      {/* Gallery */}
+      {project.gallery && project.gallery.length > 0 && (
+        <div className="mt-12 pt-10 border-t border-border">
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-6">
+            Gallery
+          </h2>
+          <div className="grid md:grid-cols-2 gap-4">
+            {project.gallery.map((image: { asset?: unknown; alt?: string; caption?: string }, i: number) => (
+              <div key={i} className="relative aspect-video rounded border border-border overflow-hidden">
+                <Image
+                  src={urlFor(image).width(800).height(450).url()}
+                  alt={image.alt ?? `Gallery image ${i + 1}`}
+                  fill
+                  className="object-cover"
+                />
+                {image.caption && (
+                  <div className="absolute bottom-0 left-0 right-0 px-3 py-2 bg-white/90">
+                    <p className="text-xs text-muted-foreground">{image.caption}</p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Bottom CTA */}
+      {(project.link || project.githubUrl) && (
+        <div className="mt-12 pt-8 border-t border-border flex gap-3">
+          {project.link && (
+            <a
+              href={project.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-sm border border-foreground rounded px-4 py-2 text-foreground hover:bg-foreground hover:text-white transition-colors"
+            >
+              <ExternalLink className="h-3.5 w-3.5" />
+              Visit Live Site
+            </a>
+          )}
+          {project.githubUrl && (
+            <a
+              href={project.githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-sm border border-border rounded px-4 py-2 text-muted-foreground hover:text-foreground hover:border-foreground transition-colors"
+            >
+              <Github className="h-3.5 w-3.5" />
+              View Source
+            </a>
+          )}
+        </div>
+      )}
+    </div>
+  );
 }

@@ -1,348 +1,198 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, Mail, MapPin, Download, ExternalLink, Calendar, Briefcase, GraduationCap } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ArrowLeft, Mail, ExternalLink } from "lucide-react";
 import { experiences } from "@/data/experience";
 import { education } from "@/data/education";
-import Image from "next/image";
 import { useState } from "react";
 
 export default function AboutPage() {
   const [activeTab, setActiveTab] = useState<"experience" | "education">("experience");
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Animated Background */}
-      <div className="fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl opacity-20 animate-pulse" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-primary/10 rounded-full blur-3xl opacity-20 animate-pulse delay-1000" />
+    <div className="max-w-5xl mx-auto px-6 py-10 md:py-16">
+      {/* Back */}
+      <Link
+        href="/"
+        className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors mb-8"
+      >
+        <ArrowLeft className="h-3 w-3" />
+        Back
+      </Link>
+
+      {/* Intro */}
+      <div className="max-w-2xl mb-12">
+        <h1 className="text-2xl font-semibold text-foreground mb-6">About</h1>
+
+        <div className="space-y-4 text-sm text-foreground leading-relaxed">
+          <p>
+            I&apos;m a software engineer and analytics student at{" "}
+            <span className="font-medium">Northeastern University</span>, building things at the
+            intersection of ML systems and cloud infrastructure. I&apos;m currently completing a
+            Master&apos;s in Analytics (GPA 3.96, expected 2027).
+          </p>
+          <p>
+            My day-to-day involves leading a 30-student research team at the Feminine Intelligence
+            Agency, where we evaluate whether large language models can detect psychological
+            manipulation in relationships — using a 28-trait UNES clinical psychology framework
+            with GPT-4o, Claude, and DeepSeek.
+          </p>
+          <p>
+            Before that, I was a Software Engineer at{" "}
+            <span className="font-medium">Travlog</span> (a YC-tracked startup), where I built a
+            cross-platform social travel app from scratch — offline-first SQLite storage, AWS cloud
+            architecture, and a Node.js + Kotlin backend managing 40+ REST endpoints.
+          </p>
+          <p>
+            I compete on Kaggle and build production ML systems. Recent work: a top-20% finish in
+            March Machine Learning Mania 2026 (3,000+ competitors), an agentic clinical AI pipeline
+            for Google&apos;s MedGemma Challenge, and a production RAG system deployed on AWS with
+            full observability.
+          </p>
+          <p>
+            Outside of work, I run a YouTube channel — currently{" "}
+            <span className="font-medium">13K subscribers and 1M+ views</span> — originally about
+            Flutter development, evolving toward AI/ML systems and applied research.
+          </p>
+        </div>
+
+        {/* Quick facts */}
+        <div className="mt-8 grid grid-cols-3 gap-4">
+          {[
+            { label: "Years of experience", value: "2+" },
+            { label: "GPA (Northeastern)", value: "3.96" },
+            { label: "YouTube subscribers", value: "13K" },
+          ].map((fact) => (
+            <div key={fact.label} className="border border-border rounded p-4">
+              <div className="text-xl font-semibold text-foreground mb-1">{fact.value}</div>
+              <div className="text-xs text-muted-foreground leading-snug">{fact.label}</div>
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl">
-        <div className="container flex h-16 items-center justify-between max-w-6xl mx-auto px-4">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Home
-          </Link>
-          <div className="flex gap-3">
-            <Button variant="outline" size="sm" asChild>
-              <a href="/resume.pdf" target="_blank" rel="noopener noreferrer">
-                <Download className="h-4 w-4 mr-2" />
-                Resume
-              </a>
-            </Button>
-            <Button size="sm" asChild>
-              <a href="mailto:singh.shiva@northeastern.edu">
-                <Mail className="h-4 w-4 mr-2" />
-                Contact
-              </a>
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      {/* Hero Section */}
-      <section className="py-20 md:py-32">
-        <div className="container max-w-6xl mx-auto px-4">
-          <div className="grid md:grid-cols-[2fr_1fr] gap-12 items-center">
-            <div className="space-y-6">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-                </span>
-                <span className="text-sm font-medium text-primary">Available for opportunities</span>
-              </div>
-              
-              <h1 className="text-5xl md:text-7xl font-bold tracking-tight">
-                Hi, I'm <span className="text-primary">Shivansh</span>
-              </h1>
-              
-              <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed">
-                An AI/ML Engineer building intelligent systems at the intersection of 
-                <span className="text-foreground font-semibold"> engineering</span> and 
-                <span className="text-foreground font-semibold"> machine learning</span>.
-              </p>
-
-              <div className="flex flex-wrap gap-4 pt-4">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <MapPin className="h-4 w-4 text-primary" />
-                  <span>Boston, MA</span>
-                </div>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Briefcase className="h-4 w-4 text-primary" />
-                  <span>Software Engineer</span>
-                </div>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <GraduationCap className="h-4 w-4 text-primary" />
-                  <span>Northeastern University</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Stats Cards */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-6 hover:border-primary/30 transition-all">
-                <div className="text-4xl font-bold text-primary mb-2">2+</div>
-                <div className="text-sm text-muted-foreground">Years Experience</div>
-              </div>
-              <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-6 hover:border-primary/30 transition-all">
-                <div className="text-4xl font-bold text-primary mb-2">10+</div>
-                <div className="text-sm text-muted-foreground">Projects Built</div>
-              </div>
-              <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-6 hover:border-primary/30 transition-all">
-                <div className="text-4xl font-bold text-primary mb-2">4.0</div>
-                <div className="text-sm text-muted-foreground">GPA</div>
-              </div>
-              <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-6 hover:border-primary/30 transition-all">
-                <div className="text-4xl font-bold text-primary mb-2">100+</div>
-                <div className="text-sm text-muted-foreground">Contributions</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* About Story with Avatar */}
-      <section className="py-20 border-t border-border/50">
-        <div className="container max-w-5xl mx-auto px-4">
-          <div className="grid md:grid-cols-[300px_1fr] gap-12 items-start">
-            {/* Avatar */}
-            <div className="flex justify-center md:justify-start">
-              <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-primary to-primary/50 rounded-full blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse"></div>
-                <div className="relative w-64 h-64 rounded-full overflow-hidden border-4 border-background shadow-2xl">
-                  <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-                    <span className="text-8xl font-bold text-primary">SS</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Story Content */}
-            <div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-8">
-                My <span className="text-primary">Story</span>
-              </h2>
-              <div className="prose prose-lg prose-neutral dark:prose-invert max-w-none">
-                <p className="text-lg text-muted-foreground leading-relaxed mb-6">
-                  I'm currently pursuing my Master's in Analytics at Northeastern University, where I'm diving deep into 
-                  the world of data science and machine learning. My journey in tech has been driven by a passion for 
-                  creating solutions that make a real impact.
-                </p>
-                <p className="text-lg text-muted-foreground leading-relaxed mb-6">
-                  At Travlog Inc, I led the development of a cross-platform social travel app from scratch, architecting 
-                  scalable backend systems on AWS and implementing ML-powered features. The experience taught me the 
-                  importance of building systems that not only work but scale gracefully.
-                </p>
-                <p className="text-lg text-muted-foreground leading-relaxed">
-                  I love working on projects that combine data science, machine learning, and full-stack development. 
-                  Whether it's building ETL pipelines processing 100K+ daily posts or creating AI-powered sentiment 
-                  analysis systems, I'm always excited to tackle challenging problems.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Experience & Education Tabs */}
-      <section className="py-20 border-t border-border/50">
-        <div className="container max-w-6xl mx-auto px-4">
-          {/* Tab Buttons */}
-          <div className="flex gap-4 mb-12">
+      {/* Experience / Education tabs */}
+      <div>
+        {/* Tab nav */}
+        <div className="flex gap-0 border-b border-border mb-8">
+          {(["experience", "education"] as const).map((tab) => (
             <button
-              onClick={() => setActiveTab("experience")}
-              className={`px-6 py-3 rounded-xl font-medium transition-all ${
-                activeTab === "experience"
-                  ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
-                  : "bg-card/30 text-muted-foreground hover:bg-card/50"
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`text-sm px-4 py-2 -mb-px border-b-2 transition-colors capitalize ${
+                activeTab === tab
+                  ? "border-foreground text-foreground font-medium"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
               }`}
             >
-              <Briefcase className="h-4 w-4 inline mr-2" />
-              Work Experience
+              {tab === "experience" ? "Work Experience" : "Education"}
             </button>
-            <button
-              onClick={() => setActiveTab("education")}
-              className={`px-6 py-3 rounded-xl font-medium transition-all ${
-                activeTab === "education"
-                  ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
-                  : "bg-card/30 text-muted-foreground hover:bg-card/50"
-              }`}
-            >
-              <GraduationCap className="h-4 w-4 inline mr-2" />
-              Education
-            </button>
-          </div>
-
-          {/* Experience Content */}
-          {activeTab === "experience" && (
-            <div className="space-y-6 animate-in fade-in duration-500">
-              {experiences.map((exp, index) => (
-                <div
-                  key={index}
-                  className="group bg-card/30 backdrop-blur-sm border border-border/50 rounded-2xl p-8 hover:bg-card/50 hover:border-primary/30 transition-all duration-300"
-                >
-                  <div className="flex gap-6">
-                    <div className="flex-shrink-0">
-                      <div className="relative w-16 h-16 rounded-xl bg-background border border-border/50 flex items-center justify-center overflow-hidden group-hover:border-primary/30 transition-all">
-                        {exp.logo ? (
-                          <Image
-                            src={exp.logo}
-                            alt={`${exp.company} logo`}
-                            width={64}
-                            height={64}
-                            className="object-contain"
-                          />
-                        ) : (
-                          <span className="text-2xl font-bold text-primary">
-                            {exp.company.charAt(0)}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between mb-4">
-                        <div>
-                          <h3 className="text-2xl font-bold group-hover:text-primary transition-colors mb-1">
-                            {exp.role}
-                          </h3>
-                          <p className="text-lg text-muted-foreground mb-2">
-                            {exp.company} · {exp.type}
-                          </p>
-                          <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-                            <div className="flex items-center gap-1">
-                              <Calendar className="h-4 w-4" />
-                              {exp.period}
-                            </div>
-                            {exp.location && (
-                              <div className="flex items-center gap-1">
-                                <MapPin className="h-4 w-4" />
-                                {exp.location}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      {exp.description && (
-                        <ul className="space-y-3 mb-6">
-                          {exp.description.map((desc, i) => (
-                            <li key={i} className="flex gap-3 text-muted-foreground">
-                              <span className="text-primary mt-1 shrink-0">▹</span>
-                              <span className="leading-relaxed">{desc}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                      {exp.skills && (
-                        <div className="flex flex-wrap gap-2">
-                          {exp.skills.map((skill, i) => (
-                            <span
-                              key={i}
-                              className="px-3 py-1 text-xs rounded-full bg-primary/10 text-primary border border-primary/20"
-                            >
-                              {skill}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Education Content */}
-          {activeTab === "education" && (
-            <div className="space-y-6 animate-in fade-in duration-500">
-              {education.map((edu, index) => (
-                <div
-                  key={index}
-                  className="group bg-card/30 backdrop-blur-sm border border-border/50 rounded-2xl p-8 hover:bg-card/50 hover:border-primary/30 transition-all duration-300"
-                >
-                  <div className="flex gap-6">
-                    <div className="flex-shrink-0">
-                      <div className="relative w-16 h-16 rounded-xl bg-background border border-border/50 flex items-center justify-center overflow-hidden group-hover:border-primary/30 transition-all">
-                        {edu.logo ? (
-                          <Image
-                            src={edu.logo}
-                            alt={`${edu.school} logo`}
-                            width={64}
-                            height={64}
-                            className="object-contain"
-                          />
-                        ) : (
-                          <span className="text-2xl font-bold text-primary">
-                            {edu.school.charAt(0)}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-2xl font-bold group-hover:text-primary transition-colors mb-1">
-                        {edu.school}
-                      </h3>
-                      <p className="text-lg text-muted-foreground mb-2">
-                        {edu.degree}, {edu.field}
-                      </p>
-                      <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mb-4">
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-4 w-4" />
-                          {edu.period}
-                        </div>
-                        {edu.location && (
-                          <div className="flex items-center gap-1">
-                            <MapPin className="h-4 w-4" />
-                            {edu.location}
-                          </div>
-                        )}
-                      </div>
-                      {edu.gpa && (
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary border border-primary/20">
-                          <span className="font-semibold">GPA: {edu.gpa}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+          ))}
         </div>
-      </section>
 
-      {/* CTA Section */}
-      <section className="py-20 border-t border-border/50">
-        <div className="container max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Let's Work <span className="text-primary">Together</span>
-          </h2>
-          <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-            I'm always interested in hearing about new projects and opportunities. 
-            Whether you have a question or just want to say hi, feel free to reach out!
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Button size="lg" asChild>
-              <a href="mailto:singh.shiva@northeastern.edu">
-                <Mail className="mr-2 h-5 w-5" />
-                Send me an email
-              </a>
-            </Button>
-            <Button size="lg" variant="outline" asChild>
-              <a href="https://linkedin.com/in/shivanshsinghh" target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="mr-2 h-5 w-5" />
-                Connect on LinkedIn
-              </a>
-            </Button>
+        {/* Experience */}
+        {activeTab === "experience" && (
+          <div className="space-y-0 divide-y divide-border">
+            {experiences.map((exp, i) => (
+              <div key={i} className="py-6">
+                <div className="flex items-start justify-between gap-4 mb-3">
+                  <div>
+                    <p className="text-sm font-semibold text-foreground leading-snug">
+                      {exp.role}
+                      <span className="font-normal text-muted-foreground"> · {exp.company}</span>
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {exp.type} · {exp.location}
+                    </p>
+                  </div>
+                  <span className="text-xs text-muted-foreground whitespace-nowrap shrink-0 pt-0.5">
+                    {exp.period}
+                  </span>
+                </div>
+
+                {exp.description && (
+                  <ul className="space-y-2 mb-4">
+                    {exp.description.map((desc, j) => (
+                      <li key={j} className="flex gap-3 text-sm text-muted-foreground">
+                        <span className="text-foreground shrink-0 mt-0.5">·</span>
+                        <span className="leading-relaxed">{desc}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
+                {exp.skills && (
+                  <div className="flex flex-wrap gap-1.5">
+                    {exp.skills.map((skill) => (
+                      <span
+                        key={skill}
+                        className="text-xs px-2 py-0.5 bg-secondary text-muted-foreground border border-border rounded"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
-        </div>
-      </section>
+        )}
+
+        {/* Education */}
+        {activeTab === "education" && (
+          <div className="space-y-0 divide-y divide-border">
+            {education.map((edu, i) => (
+              <div key={i} className="py-6">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-sm font-semibold text-foreground leading-snug">
+                      {edu.school}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {edu.degree}, {edu.field}
+                      {edu.gpa ? ` · GPA ${edu.gpa}` : ""}
+                    </p>
+                    {edu.location && (
+                      <p className="text-xs text-muted-foreground mt-0.5">{edu.location}</p>
+                    )}
+                  </div>
+                  <span className="text-xs text-muted-foreground whitespace-nowrap shrink-0 pt-0.5">
+                    {edu.period}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* CTA */}
+      <div className="mt-12 pt-10 border-t border-border flex flex-wrap gap-3">
+        <a
+          href="mailto:singh.shivan@northeastern.edu"
+          className="inline-flex items-center gap-1.5 text-sm border border-foreground rounded px-4 py-2 text-foreground hover:bg-foreground hover:text-white transition-colors"
+        >
+          <Mail className="h-3.5 w-3.5" />
+          Send an email
+        </a>
+        <a
+          href="https://linkedin.com/in/shivanshsinghh"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 text-sm border border-border rounded px-4 py-2 text-muted-foreground hover:text-foreground hover:border-foreground transition-colors"
+        >
+          <ExternalLink className="h-3.5 w-3.5" />
+          Connect on LinkedIn
+        </a>
+        <a
+          href="/resume.pdf"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 text-sm border border-border rounded px-4 py-2 text-muted-foreground hover:text-foreground hover:border-foreground transition-colors"
+        >
+          Download CV
+        </a>
+      </div>
     </div>
   );
 }
