@@ -24,16 +24,16 @@ export default function AboutPage() {
       <div className="max-w-2xl mb-12">
         <h1 className="text-2xl font-semibold text-foreground mb-6">About</h1>
 
-        <div className="space-y-4 text-sm text-foreground leading-relaxed">
+        <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
           <p>
             I&apos;m a software engineer and analytics student at{" "}
-            <span className="font-medium">Northeastern University</span>, building things at the
+            <span className="font-medium text-foreground">Northeastern University</span>, building things at the
             intersection of ML systems and cloud infrastructure. I&apos;m currently completing a
             Master&apos;s in Analytics (GPA 3.96, expected 2027).
           </p>
           <p>
             My day-to-day involves leading a 30-student research team at the{" "}
-            <Link href="/work/fia" className="font-medium underline underline-offset-2 hover:text-[#cc0000] transition-colors">
+            <Link href="/work/fia" className="font-medium text-foreground underline underline-offset-2 decoration-accent/40 hover:decoration-accent transition-colors">
               Feminine Intelligence Agency
             </Link>, where we evaluate whether large language models can detect psychological
             manipulation in relationships - using a 28-trait UNES clinical psychology framework
@@ -41,7 +41,7 @@ export default function AboutPage() {
           </p>
           <p>
             Before that, I was a Software Engineer at{" "}
-            <Link href="/work/travlog" className="font-medium underline underline-offset-2 hover:text-[#cc0000] transition-colors">
+            <Link href="/work/travlog" className="font-medium text-foreground underline underline-offset-2 decoration-accent/40 hover:decoration-accent transition-colors">
               Travlog
             </Link>{" "}
             (a YC-tracked startup), where I built a cross-platform social travel app from scratch -
@@ -65,7 +65,7 @@ export default function AboutPage() {
             { label: "GPA (Northeastern)", value: "3.96" },
             { label: "Student researchers led", value: "30" },
           ].map((fact) => (
-            <div key={fact.label} className="border border-border rounded p-4">
+            <div key={fact.label} className="border border-border rounded-lg p-4 bg-secondary/50">
               <div className="text-xl font-semibold text-foreground mb-1">{fact.value}</div>
               <div className="text-xs text-muted-foreground leading-snug">{fact.label}</div>
             </div>
@@ -81,11 +81,10 @@ export default function AboutPage() {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`text-sm px-4 py-2 -mb-px border-b-2 transition-colors capitalize ${
-                activeTab === tab
-                  ? "border-foreground text-foreground font-medium"
+              className={`text-sm px-4 py-2 -mb-px border-b-2 transition-colors capitalize ${activeTab === tab
+                  ? "border-accent text-foreground font-medium"
                   : "border-transparent text-muted-foreground hover:text-foreground"
-              }`}
+                }`}
             >
               {tab === "experience" ? "Work Experience" : "Education"}
             </button>
@@ -116,7 +115,7 @@ export default function AboutPage() {
                   <ul className="space-y-2 mb-4">
                     {exp.description.map((desc, j) => (
                       <li key={j} className="flex gap-3 text-sm text-muted-foreground">
-                        <span className="text-foreground shrink-0 mt-0.5">·</span>
+                        <span className="text-accent shrink-0 mt-0.5">·</span>
                         <span className="leading-relaxed">{desc}</span>
                       </li>
                     ))}
@@ -128,7 +127,7 @@ export default function AboutPage() {
                     {exp.skills.map((skill) => (
                       <span
                         key={skill}
-                        className="text-xs px-2 py-0.5 bg-secondary text-muted-foreground border border-border rounded"
+                        className="text-xs px-2 py-0.5 bg-secondary text-foreground border border-border rounded"
                       >
                         {skill}
                       </span>
@@ -172,7 +171,7 @@ export default function AboutPage() {
       <div className="mt-12 pt-10 border-t border-border flex flex-wrap gap-3">
         <a
           href="mailto:singh.shivan@northeastern.edu"
-          className="inline-flex items-center gap-1.5 text-sm border border-foreground rounded px-4 py-2 text-foreground hover:bg-foreground hover:text-white transition-colors"
+          className="inline-flex items-center gap-1.5 text-sm border border-foreground rounded px-4 py-2 text-foreground hover:bg-foreground hover:text-background transition-colors"
         >
           <Mail className="h-3.5 w-3.5" />
           Send an email

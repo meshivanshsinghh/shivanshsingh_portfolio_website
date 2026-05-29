@@ -16,13 +16,16 @@ export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-white">
+    <header className="sticky top-0 z-50 w-full border-b border-border bg-white/80 backdrop-blur-xl">
       <div className="max-w-5xl mx-auto px-6 flex h-14 items-center justify-between">
         <Link
           href="/"
-          className="text-sm font-semibold text-foreground tracking-tight hover:text-accent transition-colors"
+          className="flex items-center hover:opacity-80 transition-opacity"
+          aria-label="Home"
         >
-          Shivansh Singh
+          <div className="w-8 h-8 rounded-lg bg-foreground text-white flex items-center justify-center font-bold text-sm tracking-tight shadow-sm">
+            SS
+          </div>
         </Link>
 
         {/* Desktop nav */}

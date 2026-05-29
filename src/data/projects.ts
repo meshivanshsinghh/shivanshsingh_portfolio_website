@@ -30,7 +30,7 @@ export const projects: Project[] = [
     id: "ncaa",
     title: "NCAA March Madness Predictor",
     description:
-      "End-to-end tournament prediction pipeline for Kaggle's March Machine Learning Mania 2026. 29-feature XGBoost model incorporating Elo ratings, GLM team quality estimates, and pace-adjusted box scores from 211,716 regular season games — finishing top 20% (rank 599) among 3,000+ competitors.",
+      "End-to-end tournament prediction pipeline for Kaggle's March Machine Learning Mania 2026. 29-feature XGBoost model incorporating Elo ratings, GLM team quality estimates, and pace-adjusted box scores from 211,716 regular season games - finishing top 20% (rank 599) among 3,000+ competitors.",
     headline:
       "Top 20% finish (rank 599) among 3,000+ competitors with a 29-feature XGBoost model blended against bookmaker odds",
     date: "Mar 2026",
@@ -79,7 +79,7 @@ export const projects: Project[] = [
     id: "credit_risk",
     title: "Credit Risk Analysis Dashboard",
     description:
-      "PowerBI dashboard surfacing portfolio-level risk across 307,511 loan applications from the Home Credit Default Risk dataset. 45+ DAX measures, three-tier drill-down architecture, and SQL-driven aggregations — revealing that 34.6% of applications fall into high-risk segments.",
+      "PowerBI dashboard surfacing portfolio-level risk across 307,511 loan applications from the Home Credit Default Risk dataset. 45+ DAX measures, three-tier drill-down architecture, and SQL-driven aggregations - revealing that 34.6% of applications fall into high-risk segments.",
     headline:
       "PowerBI dashboard surfacing portfolio-level risk across 307,511 loan applications, replacing application-by-application Excel review",
     date: "Aug 2025",

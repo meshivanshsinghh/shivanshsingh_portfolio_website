@@ -1,12 +1,24 @@
 export default function Loading() {
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-center space-y-4">
-        <div className="relative w-16 h-16 mx-auto">
-          <div className="absolute inset-0 rounded-full border-4 border-primary/20"></div>
-          <div className="absolute inset-0 rounded-full border-4 border-primary border-t-transparent animate-spin"></div>
+    <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="flex flex-col items-center justify-center">
+        {/* ML Tensor Matrix Loader */}
+        <div className="grid grid-cols-3 gap-1.5 mb-6">
+          {[...Array(9)].map((_, i) => (
+            <div 
+              key={i} 
+              className="w-2.5 h-2.5 bg-foreground rounded-sm opacity-20 animate-pulse"
+              style={{ animationDelay: `${(i % 3) * 150 + Math.floor(i / 3) * 100}ms`, animationDuration: '1.2s' }}
+            />
+          ))}
         </div>
-        <p className="text-muted-foreground">Loading...</p>
+        
+        {/* Terminal Loading Text */}
+        <div className="flex items-center gap-2">
+          <p className="text-xs font-mono text-muted-foreground animate-pulse">
+            &gt; Loading neural weights...
+          </p>
+        </div>
       </div>
     </div>
   );

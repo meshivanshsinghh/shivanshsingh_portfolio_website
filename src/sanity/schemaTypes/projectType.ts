@@ -7,10 +7,10 @@ export const projectType = defineType({
   type: 'document',
   icon: RocketIcon,
   groups: [
-    {name: 'basic', title: 'Basic Info', default: true},
-    {name: 'details', title: 'Details'},
-    {name: 'media', title: 'Media'},
-    {name: 'content', title: 'Content'},
+    { name: 'basic', title: 'Basic Info', default: true },
+    { name: 'details', title: 'Details' },
+    { name: 'media', title: 'Media' },
+    { name: 'content', title: 'Content' },
   ],
   fields: [
     defineField({
@@ -71,7 +71,7 @@ export const projectType = defineType({
       name: 'award',
       title: 'Award / Competition',
       type: 'string',
-      description: 'e.g. "Kaggle March Machine Learning Mania 2026" — shown in red next to title',
+      description: 'e.g. "Kaggle March Machine Learning Mania 2026" - shown in red next to title',
       group: 'basic',
     }),
     defineField({
@@ -112,15 +112,15 @@ export const projectType = defineType({
         {
           type: 'object',
           fields: [
-            { 
-              name: 'name', 
-              type: 'string', 
+            {
+              name: 'name',
+              type: 'string',
               title: 'Technology Name',
               validation: (Rule) => Rule.required(),
             },
-            { 
-              name: 'url', 
-              type: 'url', 
+            {
+              name: 'url',
+              type: 'url',
               title: 'Documentation URL (optional)',
             },
           ],
@@ -208,7 +208,7 @@ export const projectType = defineType({
       subtitle: 'date',
       featured: 'featured',
     },
-    prepare({title, media, subtitle, featured}) {
+    prepare({ title, media, subtitle, featured }) {
       return {
         title: featured ? `⭐ ${title}` : title,
         media,

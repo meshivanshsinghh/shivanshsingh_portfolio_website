@@ -50,14 +50,10 @@ const projectRoleMap: Record<string, string[]> = {
 export default function ProjectsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRole, setSelectedRole] = useState("All");
-  const [sanityProjects, setSanityProjects] = useState<SanityProject[]>([]);
-
-  useEffect(() => {
+  const [sanityProjects, setSanityProjects] = useState<SanityProject[]>(() => {
     const cached = getCachedData();
-    if (cached?.projects && cached.projects.length > 0) {
-      setSanityProjects(cached.projects);
-    }
-  }, []);
+    return cached?.projects && cached.projects.length > 0 ? cached.projects : [];
+  });
 
   const projectsData = useMemo(() => {
     if (sanityProjects.length > 0) return sanityProjects;
@@ -89,7 +85,7 @@ export default function ProjectsPage() {
         </Link>
         <h1 className="text-2xl font-semibold text-foreground mb-2">Projects</h1>
         <p className="text-sm text-muted-foreground">
-          {staticProjects.length} projects — ranging from Kaggle competitions to production ML systems.
+          {staticProjects.length} projects - ranging from Kaggle competitions to production ML systems.
         </p>
       </div>
 
@@ -101,7 +97,7 @@ export default function ProjectsPage() {
           placeholder="Search projects..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-9 pr-4 py-2 text-sm border border-border rounded bg-white focus:outline-none focus:ring-1 focus:ring-ring placeholder:text-muted-foreground"
+          className="w-full pl-9 pr-4 py-2 text-sm border border-border rounded-lg bg-white text-foreground focus:outline-none focus:border-muted-foreground placeholder:text-muted-foreground shadow-sm"
         />
       </div>
 
@@ -111,11 +107,10 @@ export default function ProjectsPage() {
           <button
             key={role}
             onClick={() => setSelectedRole(role)}
-            className={`text-xs px-3 py-1.5 rounded border transition-colors ${
-              selectedRole === role
-                ? "bg-foreground text-white border-foreground"
-                : "bg-white text-muted-foreground border-border hover:border-foreground hover:text-foreground"
-            }`}
+            className={`text-xs px-3 py-1.5 rounded-lg border transition-colors ${selectedRole === role
+                ? "bg-foreground text-background border-foreground"
+                : "bg-transparent text-muted-foreground border-border hover:border-muted-foreground hover:text-foreground"
+              }`}
           >
             {role}
           </button>
@@ -143,8 +138,8 @@ export default function ProjectsPage() {
                       {project.title}
                     </Link>
                     {extended.award && (
-                      <span className="text-xs text-[#cc0000] font-medium">
-                        {extended.award}
+                      <span className="text-[10px] text-accent font-medium bg-accent/10 border border-accent/20 px-2 py-0.5 rounded-full">
+                        ✦ {extended.award}
                       </span>
                     )}
                   </div>
@@ -155,7 +150,7 @@ export default function ProjectsPage() {
                     {(extended.techStack ?? project.tags ?? []).slice(0, 6).map((t) => (
                       <span
                         key={t}
-                        className="text-xs px-2 py-0.5 bg-secondary text-muted-foreground border border-border rounded"
+                        className="text-xs px-2 py-0.5 bg-secondary text-foreground border border-border rounded"
                       >
                         {t}
                       </span>

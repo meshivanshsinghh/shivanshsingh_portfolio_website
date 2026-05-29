@@ -13,7 +13,7 @@ export default function ProfileSidebar() {
     <aside className="w-full md:w-56 lg:w-64 shrink-0 self-start md:sticky md:top-[5.5rem]">
       <div className="space-y-5">
 
-        {/* Photo — circular */}
+        {/* Photo - circular */}
         <div className="w-38 h-38 rounded-full overflow-hidden bg-secondary border-2 border-[#e0e0e0] relative">
           <Image
             src="/gpt_image.png"

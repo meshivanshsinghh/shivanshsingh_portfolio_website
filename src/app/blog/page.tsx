@@ -10,14 +10,10 @@ import { getCachedData } from "@/lib/sanity-service";
 export default function BlogPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
-  const [sanityPosts, setSanityPosts] = useState<SanityBlogPost[]>([]);
-
-  useEffect(() => {
+  const [sanityPosts, setSanityPosts] = useState<SanityBlogPost[]>(() => {
     const cached = getCachedData();
-    if (cached?.blogPosts && cached.blogPosts.length > 0) {
-      setSanityPosts(cached.blogPosts);
-    }
-  }, []);
+    return cached?.blogPosts && cached.blogPosts.length > 0 ? cached.blogPosts : [];
+  });
 
   const postsData = useMemo(() => {
     if (sanityPosts.length > 0) return sanityPosts;
@@ -71,7 +67,7 @@ export default function BlogPage() {
           placeholder="Search posts..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-9 pr-4 py-2 text-sm border border-border rounded bg-white focus:outline-none focus:ring-1 focus:ring-ring placeholder:text-muted-foreground"
+          className="w-full pl-9 pr-4 py-2 text-sm border border-border rounded-lg bg-white text-foreground focus:outline-none focus:border-muted-foreground placeholder:text-muted-foreground shadow-sm"
         />
       </div>
 
@@ -80,10 +76,10 @@ export default function BlogPage() {
         <div className="flex flex-wrap gap-2 mb-10">
           <button
             onClick={() => setSelectedTag(null)}
-            className={`text-xs px-3 py-1.5 rounded border transition-colors ${
+            className={`text-xs px-3 py-1.5 rounded-lg border transition-colors ${
               !selectedTag
-                ? "bg-foreground text-white border-foreground"
-                : "bg-white text-muted-foreground border-border hover:border-foreground hover:text-foreground"
+                ? "bg-foreground text-background border-foreground"
+                : "bg-transparent text-muted-foreground border-border hover:border-muted-foreground hover:text-foreground"
             }`}
           >
             All topics
@@ -92,10 +88,10 @@ export default function BlogPage() {
             <button
               key={tag}
               onClick={() => setSelectedTag(tag)}
-              className={`text-xs px-3 py-1.5 rounded border transition-colors ${
+              className={`text-xs px-3 py-1.5 rounded-lg border transition-colors ${
                 selectedTag === tag
-                  ? "bg-foreground text-white border-foreground"
-                  : "bg-white text-muted-foreground border-border hover:border-foreground hover:text-foreground"
+                  ? "bg-foreground text-background border-foreground"
+                  : "bg-transparent text-muted-foreground border-border hover:border-muted-foreground hover:text-foreground"
               }`}
             >
               {tag}
@@ -125,7 +121,7 @@ export default function BlogPage() {
             <Link
               key={post._id ?? index}
               href={`/blog/${slug}`}
-              className="flex items-start justify-between gap-4 py-5 group"
+              className="flex items-start justify-between gap-4 py-5 group hover:bg-secondary/50 -mx-4 px-4 rounded-lg transition-colors"
             >
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-foreground group-hover:text-accent transition-colors leading-snug mb-1">
@@ -139,7 +135,7 @@ export default function BlogPage() {
                     {post.tags.slice(0, 4).map((tag) => (
                       <span
                         key={tag}
-                        className="text-xs px-2 py-0.5 bg-secondary text-muted-foreground border border-border rounded"
+                        className="text-xs px-2 py-0.5 bg-secondary text-foreground border border-border rounded"
                       >
                         {tag}
                       </span>
