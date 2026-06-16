@@ -1,24 +1,23 @@
 export default function Loading() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white">
-      <div className="flex flex-col items-center justify-center">
-        {/* ML Tensor Matrix Loader */}
-        <div className="grid grid-cols-3 gap-1.5 mb-6">
-          {[...Array(9)].map((_, i) => (
-            <div 
-              key={i} 
-              className="w-2.5 h-2.5 bg-foreground rounded-sm opacity-20 animate-pulse"
-              style={{ animationDelay: `${(i % 3) * 150 + Math.floor(i / 3) * 100}ms`, animationDuration: '1.2s' }}
-            />
-          ))}
-        </div>
-        
-        {/* Terminal Loading Text */}
-        <div className="flex items-center gap-2">
-          <p className="text-xs font-mono text-muted-foreground animate-pulse">
-            &gt; Loading neural weights...
-          </p>
-        </div>
+    <div className="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center gap-6">
+      {/* Tensor matrix visualization */}
+      <div className="grid grid-cols-4 gap-1.5">
+        {Array.from({ length: 16 }).map((_, i) => (
+          <div
+            key={i}
+            className="w-2.5 h-2.5 rounded-sm bg-foreground/10 animate-pulse"
+            style={{ animationDelay: `${i * 80}ms`, animationDuration: "1.2s" }}
+          />
+        ))}
+      </div>
+      <div className="flex flex-col items-center gap-2">
+        <p className="text-sm font-mono text-foreground font-medium">
+          Loading neural weights...
+        </p>
+        <p className="text-xs font-mono text-muted-foreground">
+          initializing attention layers
+        </p>
       </div>
     </div>
   );

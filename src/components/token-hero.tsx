@@ -65,94 +65,55 @@ const SYSTEM_LOG_LINES = [
 
 const containerVariants = {
   hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: { staggerChildren: 0.05, delayChildren: 0.5 }
-  }
+  show: { opacity: 1, transition: { staggerChildren: 0.05, delayChildren: 0.5 } }
 };
-
-const lineVariants = {
-  hidden: { opacity: 0, x: -5 },
-  show: { opacity: 1, x: 0 }
-};
-
+const lineVariants = { hidden: { opacity: 0, x: -5 }, show: { opacity: 1, x: 0 } };
 const logContainerVariants = {
   hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: { staggerChildren: 0.03, delayChildren: 0.8 }
-  }
+  show: { opacity: 1, transition: { staggerChildren: 0.03, delayChildren: 0.8 } }
 };
-
-const logLineVariants = {
-  hidden: { opacity: 0, y: 5 },
-  show: { opacity: 1, y: 0 }
-};
+const logLineVariants = { hidden: { opacity: 0, y: 5 }, show: { opacity: 1, y: 0 } };
 
 const PytorchCode = () => (
-  <motion.pre 
-    variants={containerVariants}
-    initial="hidden"
-    animate="show"
+  <motion.pre variants={containerVariants} initial="hidden" animate="show"
     className="font-mono bg-transparent border-0 p-0 m-0 overflow-visible text-[10px] lg:text-[11px] text-black tracking-tight leading-relaxed flex flex-col"
   >
-    {/* macOS Traffic Lights */}
     <motion.div variants={lineVariants} className="flex gap-1.5 mb-3 opacity-60">
-       <div className="w-2 h-2 rounded-full bg-[#ff5f56]" />
-       <div className="w-2 h-2 rounded-full bg-[#ffbd2e]" />
-       <div className="w-2 h-2 rounded-full bg-[#27c93f]" />
+      <div className="w-2 h-2 rounded-full bg-[#ff5f56]" />
+      <div className="w-2 h-2 rounded-full bg-[#ffbd2e]" />
+      <div className="w-2 h-2 rounded-full bg-[#27c93f]" />
     </motion.div>
-    
     {PYTORCH_LINES.map((line, i) => (
-      <motion.div key={i} variants={lineVariants} className="min-h-[1em]">
-        {line}
-      </motion.div>
+      <motion.div key={i} variants={lineVariants} className="min-h-[1em]">{line}</motion.div>
     ))}
   </motion.pre>
 );
 
 const SystemLogs = () => (
-  <motion.pre 
-    variants={logContainerVariants}
-    initial="hidden"
-    animate="show"
+  <motion.pre variants={logContainerVariants} initial="hidden" animate="show"
     className="font-mono bg-transparent border-0 p-0 m-0 overflow-visible text-[10px] lg:text-[11px] text-black tracking-tight leading-relaxed flex flex-col items-end text-right"
   >
-    {/* Terminal header mock */}
     <motion.div variants={logLineVariants} className="flex gap-1.5 mb-3 opacity-30 justify-end">
-       <div className="w-2 h-2 rounded-full bg-black" />
-       <div className="w-2 h-2 rounded-full bg-black" />
-       <div className="w-2 h-2 rounded-full bg-black" />
+      <div className="w-2 h-2 rounded-full bg-black" />
+      <div className="w-2 h-2 rounded-full bg-black" />
+      <div className="w-2 h-2 rounded-full bg-black" />
     </motion.div>
-    
     {SYSTEM_LOG_LINES.map((line, i) => (
-      <motion.div key={i} variants={logLineVariants} className="min-h-[1em]">
-        {line}
-      </motion.div>
+      <motion.div key={i} variants={logLineVariants} className="min-h-[1em]">{line}</motion.div>
     ))}
   </motion.pre>
 );
 
-function ExpertiseBackground() {
+function CodeWatermark() {
   return (
-    <div 
-      className="absolute inset-0 overflow-hidden pointer-events-none select-none z-0 hidden md:block"
+    <div className="absolute inset-0 overflow-hidden pointer-events-none select-none z-0 hidden md:block"
       style={{
         maskImage: "linear-gradient(to right, black 0%, black 15%, transparent 35%, transparent 65%, black 85%, black 100%)",
         WebkitMaskImage: "linear-gradient(to right, black 0%, black 15%, transparent 35%, transparent 65%, black 85%, black 100%)"
       }}
     >
-      {/* Left side: ML Modeling (PyTorch) */}
-      <div className="absolute top-[40%] -translate-y-1/2 left-2 lg:left-8 opacity-40">
-        <PytorchCode />
-      </div>
-
-      {/* Right side: Systems Engineering (Logs/JSON) */}
-      <div className="absolute top-[40%] -translate-y-1/2 right-2 lg:right-8 opacity-40">
-        <SystemLogs />
-      </div>
-
-      {/* Fade boundaries */}
+      <div className="absolute top-[40%] -translate-y-1/2 left-2 lg:left-8 opacity-40"><PytorchCode /></div>
+      <div className="absolute top-[40%] -translate-y-1/2 right-2 lg:right-8 opacity-40"><SystemLogs /></div>
       <div className="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-white to-transparent z-10" />
       <div className="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white to-transparent z-10" />
       <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white to-transparent z-10" />
@@ -168,34 +129,37 @@ function ExpertiseBackground() {
 export default function TokenHero() {
   const [phase, setPhase] = useState<"static" | "tokenizing" | "tokens" | "attention">("static");
 
-  // Phase 1: Show static text for a moment, then tokenize
   useEffect(() => {
-    if (phase !== "static") return;
-    const timeout = setTimeout(() => setPhase("tokenizing"), 1200);
-    return () => clearTimeout(timeout);
-  }, [phase]);
+    // If already seen during this page lifecycle (client-side nav), skip animation.
+    // window.__heroPlayed survives Next.js router navigations but clears on reload.
+    if ((window as unknown as Record<string, unknown>).__heroPlayed) {
+      setPhase("attention");
+      window.dispatchEvent(new CustomEvent("hero-complete"));
+      return;
+    }
 
-  // Phase 2: Transition to tokens
-  useEffect(() => {
-    if (phase !== "tokenizing") return;
-    const timeout = setTimeout(() => setPhase("tokens"), 800);
-    return () => clearTimeout(timeout);
-  }, [phase]);
+    const m = window.innerWidth < 768;
 
-  // Phase 3: Show attention
-  useEffect(() => {
-    if (phase !== "tokens") return;
-    const timeout = setTimeout(() => setPhase("attention"), 1800);
-    return () => clearTimeout(timeout);
-  }, [phase]);
+    // static → tokenizing
+    const t1 = setTimeout(() => setPhase("tokenizing"), m ? 500 : 1000);
+    // tokenizing → tokens
+    const t2 = setTimeout(() => setPhase("tokens"), m ? 900 : 1600);
+    // tokens → attention (hero complete)
+    const t3 = setTimeout(() => {
+      setPhase("attention");
+      (window as unknown as Record<string, unknown>).__heroPlayed = true;
+      window.dispatchEvent(new CustomEvent("hero-complete"));
+    }, m ? 1900 : 3400);
+
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
-    <section className="relative pt-16 pb-10 md:pb-16 overflow-hidden bg-white flex flex-col justify-center">
-      
-      <ExpertiseBackground />
+    <section className="relative min-h-[260px] sm:min-h-[300px] md:min-h-[380px] flex items-center justify-center overflow-hidden pt-10 pb-6 md:pt-16 md:pb-8">
+      <CodeWatermark />
 
-      <div className="relative max-w-4xl mx-auto px-4 sm:px-6 text-center z-20 w-full">
-        {/* Name (Static, not tokenized) */}
+      <div className="relative z-20 flex flex-col items-center text-center w-full max-w-3xl mx-auto px-6">
         <motion.h1
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -205,34 +169,22 @@ export default function TokenHero() {
           Shivansh Singh
         </motion.h1>
 
-        {/* Subtitle Tokenizer Area */}
         <div className="min-h-[140px] md:min-h-[120px] flex flex-col items-center justify-start mt-2">
           <AnimatePresence mode="wait">
-            
-            {/* Phase 1: Static Subtitle */}
             {phase === "static" && (
-              <motion.div
-                key="static"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.98 }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
+              <motion.div key="static" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.98 }} transition={{ duration: 0.6, ease: "easeOut" }}
                 className="flex flex-col items-center pt-2"
               >
                 <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground font-light px-4">
-                  ML Engineer & Systems Builder
+                  ML Engineer &amp; Systems Builder
                 </p>
               </motion.div>
             )}
 
-            {/* Phase 2: Tokenizing State */}
             {phase === "tokenizing" && (
-              <motion.div
-                key="tokenizing"
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.98 }}
-                transition={{ duration: 0.3 }}
+              <motion.div key="tokenizing" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.98 }} transition={{ duration: 0.3 }}
                 className="flex flex-col items-center pt-2"
               >
                 <div className="flex items-center gap-2 text-sm text-foreground font-mono bg-white/90 backdrop-blur-md px-5 py-2 rounded-full shadow-sm border border-border">
@@ -242,16 +194,10 @@ export default function TokenHero() {
               </motion.div>
             )}
 
-            {/* Phase 3+4: Token Pills */}
             {(phase === "tokens" || phase === "attention") && (
-              <motion.div
-                key="tokens"
-                initial={{ opacity: 0, scale: 1.02 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4 }}
-                className="w-full flex flex-col items-center pt-1"
+              <motion.div key="tokens" initial={{ opacity: 0, scale: 1.02 }} animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.4 }} className="w-full flex flex-col items-center pt-1"
               >
-                {/* Token Pills */}
                 <div className="flex flex-wrap items-end justify-center gap-x-1.5 gap-y-3 px-2">
                   {TOKEN_GROUPS.map((group, gi) => (
                     <div key={`sub-${gi}`} className="flex items-end gap-0.5">
@@ -261,10 +207,8 @@ export default function TokenHero() {
                         group.tokens.map((ti, idx) => {
                           const token = TOKENS[ti];
                           return (
-                            <motion.div
-                              key={`sub-${gi}-${idx}`}
-                              initial={{ opacity: 0, y: 8 }}
-                              animate={{ opacity: 1, y: 0 }}
+                            <motion.div key={`sub-${gi}-${idx}`}
+                              initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
                               transition={{ duration: 0.3, delay: ti * 0.05, ease: "easeOut" }}
                               className="group flex flex-col items-center gap-1 cursor-default"
                             >
@@ -277,17 +221,11 @@ export default function TokenHero() {
                               >
                                 {token.id}
                               </motion.span>
-                              <span
-                                className={`
-                                  inline-block px-2 sm:px-2.5 py-1 sm:py-1.5 rounded text-sm sm:text-base font-mono
-                                  border transition-all duration-300 shadow-sm
-                                  ${
-                                    phase === "attention"
-                                      ? "border-[#cc0000]/30 bg-[#fff5f5] text-[#cc0000]"
-                                      : "border-border bg-white text-foreground hover:border-[#cc0000]/40 hover:bg-[#fff5f5] hover:text-[#cc0000]"
-                                  }
-                                `}
-                              >
+                              <span className={`inline-block px-2 sm:px-2.5 py-1 sm:py-1.5 rounded text-sm sm:text-base font-mono border transition-all duration-300 shadow-sm ${
+                                phase === "attention"
+                                  ? "border-[#cc0000]/30 bg-[#fff5f5] text-[#cc0000]"
+                                  : "border-border bg-white text-foreground hover:border-[#cc0000]/40 hover:bg-[#fff5f5] hover:text-[#cc0000]"
+                              }`}>
                                 {token.text.trim()}
                               </span>
                             </motion.div>
@@ -298,10 +236,7 @@ export default function TokenHero() {
                   ))}
                 </div>
 
-                {/* Metadata line */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                   transition={{ delay: 0.6, duration: 0.5 }}
                   className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-[9px] sm:text-[10px] font-mono text-muted-foreground pt-5"
                 >
@@ -314,26 +249,6 @@ export default function TokenHero() {
           </AnimatePresence>
         </div>
 
-        {/* CTA buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8, duration: 0.5 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-4 relative z-20"
-        >
-          <a
-            href="#experiments"
-            className="w-full sm:w-auto text-sm font-medium text-white bg-foreground hover:bg-[#cc0000] border border-transparent px-6 py-2.5 rounded-lg transition-all shadow-sm"
-          >
-            View experiments
-          </a>
-          <a
-            href="#contact"
-            className="w-full sm:w-auto text-sm font-medium text-foreground hover:bg-secondary border border-border px-6 py-2.5 rounded-lg transition-all shadow-sm bg-white"
-          >
-            Get in touch
-          </a>
-        </motion.div>
       </div>
     </section>
   );

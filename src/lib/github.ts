@@ -8,7 +8,7 @@ export async function getGitHubStats(username: string): Promise<GitHubStats | nu
   try {
     const res = await fetch(`https://api.github.com/users/${username}`, {
       headers: { Accept: "application/vnd.github+json" },
-      next: { revalidate: 3600 },
+      next: { revalidate: 86400 },
     });
 
     if (!res.ok) return null;

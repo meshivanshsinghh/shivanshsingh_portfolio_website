@@ -4,6 +4,7 @@ import { ArrowUpRight, ExternalLink, Youtube, Github, Linkedin, Twitter } from "
 import ContactForm from "@/components/contact-form";
 import TokenHero from "@/components/token-hero";
 import ModelCard from "@/components/model-card";
+import AwardsCarousel from "@/components/awards-carousel";
 import { featuredProjects } from "@/data/projects";
 import { awards as staticAwards } from "@/data/awards";
 import { fetchPortfolioData } from "@/lib/sanity-service";
@@ -14,23 +15,146 @@ import { getLatestVideos } from "@/lib/youtube";
 
 export const dynamic = "force-dynamic";
 
+// ─────────────────────────────────────────────────────────────────
+// SHARED
+// ─────────────────────────────────────────────────────────────────
+
 function SectionLabel({ children, mono }: { children: React.ReactNode; mono?: boolean }) {
   return (
     <div className="flex items-center gap-2.5 mb-6">
       <span className="w-1 h-3.5 rounded-full bg-accent inline-block shrink-0" />
-      <h2
-        className={`text-xs font-semibold uppercase tracking-widest text-muted-foreground ${mono ? "font-mono" : ""
-          }`}
-      >
+      <h2 className={`text-xs font-semibold uppercase tracking-widest text-muted-foreground ${mono ? "font-mono" : ""}`}>
         {children}
       </h2>
     </div>
   );
 }
 
+// ─────────────────────────────────────────────────────────────────
+// DONUT CHART (LeetCode-style)
+// ─────────────────────────────────────────────────────────────────
+
+function LeetCodeDonut({ easy, medium, hard }: { easy: number; medium: number; hard: number }) {
+  const total = easy + medium + hard;
+  if (total === 0) return null;
+
+  const r = 36;
+  const C = 2 * Math.PI * r;
+
+  const easyLen = (easy / total) * C;
+  const medLen = (medium / total) * C;
+  const hardLen = (hard / total) * C;
+
+  return (
+    <div className="flex items-center gap-6 sm:gap-8">
+      <div className="relative w-28 h-28 sm:w-32 sm:h-32 shrink-0">
+        <svg viewBox="0 0 100 100" className="w-full h-full">
+          <g transform="rotate(-90 50 50)">
+            {/* Background track */}
+            <circle cx="50" cy="50" r={r} fill="none" stroke="#f3f4f6" strokeWidth="7" />
+            {/* Easy — green */}
+            {easyLen > 0 && (
+              <circle cx="50" cy="50" r={r} fill="none"
+                stroke="#00b8a3" strokeWidth="7" strokeLinecap="round"
+                strokeDasharray={`${easyLen} ${C - easyLen}`}
+                strokeDashoffset="0"
+              />
+            )}
+            {/* Medium — yellow */}
+            {medLen > 0 && (
+              <circle cx="50" cy="50" r={r} fill="none"
+                stroke="#ffc01e" strokeWidth="7" strokeLinecap="round"
+                strokeDasharray={`${medLen} ${C - medLen}`}
+                strokeDashoffset={easyLen}
+              />
+            )}
+            {/* Hard — red */}
+            {hardLen > 0 && (
+              <circle cx="50" cy="50" r={r} fill="none"
+                stroke="#ef4743" strokeWidth="7" strokeLinecap="round"
+                strokeDasharray={`${hardLen} ${C - hardLen}`}
+                strokeDashoffset={easyLen + medLen}
+              />
+            )}
+          </g>
+          {/* Center text */}
+          <text x="50" y="46" textAnchor="middle" dominantBaseline="central"
+            className="text-xl font-bold" fill="currentColor"
+          >
+            {total}
+          </text>
+          <text x="50" y="62" textAnchor="middle" className="text-[7px]" fill="#9ca3af">
+            solved
+          </text>
+        </svg>
+      </div>
+
+      {/* Difficulty labels */}
+      <div className="space-y-3 text-sm">
+        <div className="flex items-center gap-3">
+          <span className="w-2.5 h-2.5 rounded-sm bg-[#00b8a3]" />
+          <span className="text-muted-foreground font-mono text-xs w-10">Easy</span>
+          <span className="font-semibold text-foreground font-mono">{easy}</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="w-2.5 h-2.5 rounded-sm bg-[#ffc01e]" />
+          <span className="text-muted-foreground font-mono text-xs w-10">Med.</span>
+          <span className="font-semibold text-foreground font-mono">{medium}</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="w-2.5 h-2.5 rounded-sm bg-[#ef4743]" />
+          <span className="text-muted-foreground font-mono text-xs w-10">Hard</span>
+          <span className="font-semibold text-foreground font-mono">{hard}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────
+// TECH STACK DATA
+// ─────────────────────────────────────────────────────────────────
+
+const TECH_STACK = [
+  {
+    label: "Languages & Frameworks",
+    items: [
+      { id: "python", name: "Python" },
+      { id: "pytorch", name: "PyTorch" },
+      { id: "tensorflow", name: "TensorFlow" },
+      { id: "fastapi", name: "FastAPI" },
+      { id: "flask", name: "Flask" },
+      { id: "nodejs", name: "Node.js" },
+      { id: "dart", name: "Dart" },
+      { id: "ts", name: "TypeScript" },
+      { id: "react", name: "React" },
+      { id: "html", name: "HTML", mobileOnly: true },
+    ],
+  },
+  {
+    label: "Cloud & Infrastructure",
+    items: [
+      { id: "aws", name: "AWS" },
+      { id: "gcp", name: "GCP" },
+      { id: "firebase", name: "Firebase" },
+      { id: "docker", name: "Docker" },
+      { id: "linux", name: "Linux" },
+      { id: "git", name: "Git" },
+      { id: "github", name: "GitHub" },
+      { id: "postgres", name: "PostgreSQL" },
+      { id: "redis", name: "Redis" },
+      { id: "sqlite", name: "SQLite", mobileOnly: true },
+    ],
+  },
+];
+
+// ─────────────────────────────────────────────────────────────────
+// PAGE
+// ─────────────────────────────────────────────────────────────────
+
 export default async function Home() {
-  // Artificial delay to ensure the cool tensor loading animation is visible!
-  await new Promise(resolve => setTimeout(resolve, 1500));
+  // Brief delay so the preloader animation plays
+  await new Promise((resolve) => setTimeout(resolve, 1000));
 
   const [portfolioData, githubStats, leetcodeStats, youtubeVideos] =
     await Promise.allSettled([
@@ -43,16 +167,11 @@ export default async function Home() {
     );
 
   const data = (portfolioData as Awaited<ReturnType<typeof fetchPortfolioData>>) ?? {
-    projects: [],
-    blogPosts: [],
-    experiences: [],
-    educations: [],
-    awards: [],
+    projects: [], blogPosts: [], experiences: [], educations: [], awards: [],
   };
 
   const blogPosts = data.blogPosts ?? [];
   const awards = data.awards?.length ? data.awards : staticAwards;
-
   const projects = (
     data.projects?.filter((p) => p.featured).length
       ? data.projects.filter((p) => p.featured)
@@ -63,143 +182,239 @@ export default async function Home() {
   const leetcode = leetcodeStats as Awaited<ReturnType<typeof getLeetCodeStats>>;
   const videos = (youtubeVideos as Awaited<ReturnType<typeof getLatestVideos>>) ?? [];
 
+  // Preprocess awards for carousel
+  const carouselAwards = awards.map((award) => {
+    const id = "_id" in award ? (award as { _id: string })._id : (award as { id: string }).id;
+    let imageUrl: string | null = null;
+    if ("image" in award && award.image?.asset) {
+      try { imageUrl = urlFor(award.image).width(128).height(128).url(); }
+      catch { imageUrl = null; }
+    }
+    return {
+      id,
+      title: award.title,
+      org: award.org,
+      date: award.date,
+      url: award.url || null,
+      imageUrl,
+      sponsor: "sponsor" in award && award.sponsor ? (award.sponsor as string) : null,
+      note: "note" in award && award.note ? (award.note as string) : null,
+      linkLabel: "linkLabel" in award && award.linkLabel ? (award.linkLabel as string) : "View",
+    };
+  });
+
   return (
     <>
-      {/* ── Hero with tokenizer animation ─────────────────── */}
+      {/* ── Hero ─────────────────────────────────────────── */}
       <TokenHero />
 
-      {/* ── Model Card (Bio) ─────────────────────────────── */}
+      {/* ── Model Card ───────────────────────────────────── */}
       <ModelCard />
 
-      {/* ── Main content ─────────────────────────────────── */}
-      <div className="max-w-4xl mx-auto px-6 py-16 md:py-24 space-y-20">
+      {/* ── Content sections ─────────────────────────────── */}
+      <div className="max-w-5xl mx-auto px-6 py-16 md:py-24 space-y-20">
 
-        {/* Tech Stack */}
-        <section>
-          <SectionLabel mono>tech_stack</SectionLabel>
-          <div className="space-y-6 sm:space-y-8">
-            {[
-              {
-                label: "Languages & Frameworks",
-                items: [
-                  { id: "python", name: "Python" },
-                  { id: "pytorch", name: "PyTorch" },
-                  { id: "tensorflow", name: "TensorFlow" },
-                  { id: "fastapi", name: "FastAPI" },
-                  { id: "flask", name: "Flask" },
-                  { id: "nodejs", name: "Node.js" },
-                  { id: "dart", name: "Dart" },
-                  { id: "ts", name: "TypeScript" },
-                  { id: "html", name: "HTML" },
-                ]
-              },
-              {
-                label: "Cloud & Infrastructure",
-                items: [
-                  { id: "aws", name: "AWS" },
-                  { id: "gcp", name: "GCP" },
-                  { id: "firebase", name: "Firebase" },
-                  { id: "docker", name: "Docker" },
-                  { id: "linux", name: "Linux" },
-                  { id: "git", name: "Git" },
-                  { id: "github", name: "GitHub" },
-                  { id: "postgres", name: "PostgreSQL" },
-                  { id: "sqlite", name: "SQLite" },
-                ]
-              },
-            ].map((row) => (
-              <div key={row.label} className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4">
-                <span className="text-xs text-muted-foreground sm:w-44 shrink-0 font-medium pt-2 sm:pt-3">
-                  {row.label}
-                </span>
-                <div className="flex flex-wrap gap-3 sm:gap-4 flex-1">
-                  {row.items.map(item => (
-                    <div key={item.id} className="flex flex-col items-center gap-1.5 w-[46px] sm:w-[52px] group/icon">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={`https://skillicons.dev/icons?i=${item.id}`}
-                        alt={item.name}
-                        className="w-9 h-9 sm:w-10 sm:h-10 group-hover/icon:-translate-y-1 group-hover/icon:scale-110 transition-transform duration-300 shadow-sm rounded-lg"
-                      />
-                      <span className="text-[9px] sm:text-[10px] text-muted-foreground text-center leading-tight">{item.name}</span>
+        {/* ── 1. Capabilities ────────────────────────────── */}
+        {(github || leetcode) && (
+          <section>
+            <SectionLabel mono>capabilities</SectionLabel>
+            <div className="rounded-xl border border-border bg-white shadow-sm overflow-hidden">
+              {/* Terminal header */}
+              <div className="flex items-center gap-2 px-5 py-3 border-b border-border bg-secondary/50">
+                <div className="flex gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#cc0000]/20" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-yellow-400/50" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-green-400/50" />
+                </div>
+                <span className="text-[11px] font-mono text-muted-foreground ml-2">eval_report.log</span>
+              </div>
+
+              <div className="p-5 sm:p-6 md:p-8 space-y-5">
+                <p className="text-[11px] font-mono text-muted-foreground">
+                  &gt; running eval_suite --profile shivansh-v2026
+                </p>
+
+                {/* GitHub row */}
+                {github && (
+                  <a href="https://github.com/meshivanshsinghh" target="_blank" rel="noopener noreferrer"
+                    className="flex flex-wrap items-center gap-x-3 gap-y-1 py-2.5 group hover:bg-secondary/30 -mx-3 px-3 rounded-lg transition-colors"
+                  >
+                    <span className="text-green-600 text-sm font-mono">✓</span>
+                    <Github className="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground transition-colors shrink-0" />
+                    <span className="text-[11px] font-mono text-muted-foreground w-28 sm:w-36 shrink-0">github.activity</span>
+                    <span className="text-sm font-medium text-foreground font-mono">{github.publicRepos} repos</span>
+                    <span className="text-muted-foreground text-xs">·</span>
+                    <span className="text-sm text-foreground font-mono">{github.followers} followers</span>
+                    <span className="ml-auto shrink-0 flex items-center gap-1.5">
+                      <span className="text-green-600 text-[10px] font-mono font-semibold hidden sm:inline">PASS</span>
+                      <ArrowUpRight className="h-3 w-3 text-muted-foreground group-hover:text-foreground transition-colors" />
+                    </span>
+                  </a>
+                )}
+
+                {/* LeetCode row */}
+                {leetcode && (
+                  <a href="https://leetcode.com/u/shivanshsinghh" target="_blank" rel="noopener noreferrer"
+                    className="flex flex-wrap items-center gap-x-3 gap-y-1 py-2.5 group hover:bg-secondary/30 -mx-3 px-3 rounded-lg transition-colors"
+                  >
+                    <span className="text-green-600 text-sm font-mono">✓</span>
+                    {/* LeetCode icon (no lucide icon, use inline SVG) */}
+                    <svg className="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground transition-colors shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M13.483 0a1.374 1.374 0 0 0-.961.438L7.116 6.226l-3.854 4.126a5.266 5.266 0 0 0-1.209 2.104 5.35 5.35 0 0 0-.125.513 5.527 5.527 0 0 0 .062 2.362 5.83 5.83 0 0 0 .349 1.017 5.938 5.938 0 0 0 1.271 1.818l4.277 4.193.039.038c2.248 2.165 5.852 2.133 8.063-.074l2.396-2.392c.54-.54.54-1.414.003-1.955a1.378 1.378 0 0 0-1.951-.003l-2.396 2.392a3.021 3.021 0 0 1-4.205.038l-.02-.019-4.276-4.193c-.652-.64-.972-1.469-.948-2.263a2.68 2.68 0 0 1 .066-.523 2.545 2.545 0 0 1 .619-1.164L9.13 8.114c1.058-1.134 3.204-1.27 4.43-.278l3.501 2.831c.593.48 1.461.387 1.94-.207a1.384 1.384 0 0 0-.207-1.943l-3.5-2.831c-.8-.647-1.766-1.045-2.774-1.202l2.015-2.158A1.384 1.384 0 0 0 13.483 0zm-2.866 12.815a1.38 1.38 0 0 0-1.38 1.382 1.38 1.38 0 0 0 1.38 1.382H20.79a1.38 1.38 0 0 0 1.38-1.382 1.38 1.38 0 0 0-1.38-1.382z" />
+                    </svg>
+                    <span className="text-[11px] font-mono text-muted-foreground w-28 sm:w-36 shrink-0">leetcode.solved</span>
+                    <span className="text-sm font-medium text-foreground font-mono">{leetcode.totalSolved} total</span>
+                    <span className="text-xs font-mono text-muted-foreground">
+                      (<span className="text-emerald-600">{leetcode.easySolved}E</span>{" "}
+                      <span className="text-amber-600">{leetcode.mediumSolved}M</span>{" "}
+                      <span className="text-red-600">{leetcode.hardSolved}H</span>)
+                    </span>
+                    <span className="ml-auto shrink-0 flex items-center gap-1.5">
+                      <span className="text-green-600 text-[10px] font-mono font-semibold hidden sm:inline">PASS</span>
+                      <ArrowUpRight className="h-3 w-3 text-muted-foreground group-hover:text-foreground transition-colors" />
+                    </span>
+                  </a>
+                )}
+
+                {/* LeetCode donut chart + problem distribution */}
+                {leetcode && (
+                  <div className="border-t border-border pt-5 mt-2">
+                    <div className="flex flex-col md:flex-row gap-8 md:gap-12">
+                      {/* Donut */}
+                      <div>
+                        <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest mb-4">
+                          Difficulty Breakdown
+                        </p>
+                        <LeetCodeDonut
+                          easy={leetcode.easySolved}
+                          medium={leetcode.mediumSolved}
+                          hard={leetcode.hardSolved}
+                        />
+                      </div>
+
+                      {/* Problem distribution bars */}
+                      {leetcode.topTags && leetcode.topTags.length > 0 && (
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest mb-4">
+                            Problem Distribution
+                          </p>
+                          <div className="space-y-2.5">
+                            {leetcode.topTags.slice(0, 6).map((tag) => {
+                              const maxCount = leetcode.topTags[0].problemsSolved;
+                              const pct = Math.round((tag.problemsSolved / maxCount) * 100);
+                              return (
+                                <div key={tag.tagName} className="flex items-center gap-3 text-xs">
+                                  <span className="w-24 sm:w-28 text-muted-foreground font-mono text-[11px] truncate shrink-0">
+                                    {tag.tagName}
+                                  </span>
+                                  <div className="flex-1 h-2 rounded-full bg-gray-100 overflow-hidden max-w-[200px]">
+                                    <div className="h-full rounded-full bg-[#cc0000]/60" style={{ width: `${pct}%` }} />
+                                  </div>
+                                  <span className="text-foreground font-medium font-mono w-6 text-right text-[11px]">
+                                    {tag.problemsSolved}
+                                  </span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  ))}
+                  </div>
+                )}
+
+                {/* Tech Stack */}
+                <div className="border-t border-border pt-5 mt-2">
+                  <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest mb-4">
+                    Verified Stack
+                  </p>
+                  <div className="space-y-6 sm:space-y-8">
+                    {TECH_STACK.map((row) => (
+                      <div key={row.label} className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4">
+                        <span className="text-xs text-muted-foreground sm:w-44 shrink-0 font-medium pt-2 sm:pt-3">
+                          {row.label}
+                        </span>
+                        <div className="flex flex-wrap gap-3 sm:gap-4 flex-1">
+                          {row.items.map((item) => (
+                            <div
+                              key={item.id}
+                              className={`flex flex-col items-center gap-1.5 w-[46px] sm:w-[52px] group/icon ${
+                                "mobileOnly" in item && item.mobileOnly ? "md:hidden" : ""
+                              }`}
+                            >
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={`https://skillicons.dev/icons?i=${item.id}`}
+                                alt={item.name}
+                                className="w-9 h-9 sm:w-10 sm:h-10 group-hover/icon:-translate-y-1 group-hover/icon:scale-110 transition-transform duration-300 shadow-sm rounded-lg"
+                              />
+                              <span className="text-[9px] sm:text-[10px] text-muted-foreground text-center leading-tight">
+                                {item.name}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Footer */}
+                <div className="border-t border-border pt-3 mt-2">
+                  <p className="text-[10px] font-mono text-green-600">
+                    eval complete · 0 failures · 0 warnings
+                  </p>
                 </div>
               </div>
-            ))}
-          </div>
-        </section>
+            </div>
+          </section>
+        )}
 
-        {/* Selected Projects / Experiments */}
+        {/* ── 2. Projects ────────────────────────────────── */}
         <section id="experiments">
           <div className="flex items-center justify-between mb-6">
             <SectionLabel mono>experiments</SectionLabel>
-            <Link
-              href="/projects"
-              className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 group"
-            >
+            <Link href="/projects" className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 group">
               All projects
               <ArrowUpRight className="h-3 w-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
             </Link>
           </div>
-
           <div className="flex flex-col gap-4">
             {projects.map((project) => {
-              const id = "_id" in project
-                ? (project as { _id: string })._id
-                : (project as { id: string }).id;
+              const id = "_id" in project ? (project as { _id: string })._id : (project as { id: string }).id;
               const slug = "slug" in project && project.slug
-                ? (typeof project.slug === "object"
-                  ? (project.slug as { current: string }).current
-                  : project.slug)
+                ? (typeof project.slug === "object" ? (project.slug as { current: string }).current : project.slug)
                 : null;
               const headline = project.headline ?? project.description;
               const projectAward = project.award;
               const link = project.link;
 
-              // Helper for dynamic project images if none is provided in data
               const getProjectImage = (projId: string) => {
                 if ("image" in project && typeof project.image === "string") return project.image;
-                if (projId === "dermrx_agent") return "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=800&auto=format&fit=crop"; // Med/Tech
-                if (projId === "ncaa") return "https://images.unsplash.com/photo-1518063319789-7217e6706b04?q=80&w=800&auto=format&fit=crop"; // Basketball
-                if (projId === "rag_qa_system") return "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=800&auto=format&fit=crop"; // AI
-                return "https://images.unsplash.com/photo-1555949963-aa79dcee981c?q=80&w=800&auto=format&fit=crop"; // Generic Code
+                if (projId === "dermrx_agent") return "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=800&auto=format&fit=crop";
+                if (projId === "ncaa") return "https://images.unsplash.com/photo-1518063319789-7217e6706b04?q=80&w=800&auto=format&fit=crop";
+                if (projId === "rag_qa_system") return "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=800&auto=format&fit=crop";
+                return "https://images.unsplash.com/photo-1555949963-aa79dcee981c?q=80&w=800&auto=format&fit=crop";
               };
 
               return (
-                <div
-                  key={id}
-                  className="group/row rounded-xl border border-border bg-white overflow-hidden hover:border-gray-300 transition-all shadow-sm flex flex-row"
-                >
-                  {/* Featured Image */}
+                <div key={id} className="group/row rounded-xl border border-border bg-white overflow-hidden hover:border-gray-300 transition-all shadow-sm flex flex-row">
                   <div className="w-32 sm:w-48 md:w-64 aspect-[16/9] shrink-0 relative border-r border-border bg-secondary overflow-hidden">
-                    {/* Fallback image logic using unoptimized next/image for external URLs */}
-                    <Image
-                      src={getProjectImage(id)}
-                      alt={project.title}
-                      fill
+                    <Image src={getProjectImage(id)} alt={project.title} fill
                       className="object-cover group-hover/row:scale-[1.03] transition-transform duration-500 opacity-90 group-hover/row:opacity-100"
                       sizes="(max-width: 640px) 128px, (max-width: 768px) 192px, 256px"
                     />
-                    {/* Add a subtle overlay so it doesn't look too stark */}
                     <div className="absolute inset-0 bg-black/5 group-hover/row:bg-transparent transition-colors pointer-events-none" />
                   </div>
-
-                  {/* Content */}
                   <div className="p-4 sm:p-5 flex-1 min-w-0 w-full flex flex-col justify-center">
                     <div className="flex items-start justify-between gap-3 mb-1.5">
                       <div className="flex items-center gap-2.5 flex-wrap min-w-0">
                         {slug ? (
-                          <Link
-                            href={`/projects/${slug}`}
-                            className="text-sm font-semibold text-foreground hover:text-accent transition-colors"
-                          >
+                          <Link href={`/projects/${slug}`} className="text-sm font-semibold text-foreground hover:text-accent transition-colors">
                             {project.title}
                           </Link>
                         ) : (
-                          <span className="text-sm font-semibold text-foreground">
-                            {project.title}
-                          </span>
+                          <span className="text-sm font-semibold text-foreground">{project.title}</span>
                         )}
                         {projectAward && (
                           <span className="text-[10px] font-medium text-[#cc0000] bg-[#fff5f5] border border-[#ffd0d0] px-2 py-0.5 rounded-full whitespace-nowrap">
@@ -210,11 +425,7 @@ export default async function Home() {
                       <div className="flex items-center gap-2 shrink-0 text-xs text-muted-foreground whitespace-nowrap pt-0.5">
                         <span>{project.date}</span>
                         {link && (
-                          <a
-                            href={link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label={`Open ${project.title}`}
+                          <a href={link} target="_blank" rel="noopener noreferrer" aria-label={`Open ${project.title}`}
                             className="text-muted-foreground hover:text-foreground transition-colors"
                           >
                             <ExternalLink className="h-3 w-3" />
@@ -222,10 +433,7 @@ export default async function Home() {
                         )}
                       </div>
                     </div>
-                    {/* Description */}
-                    <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3 mt-1 sm:mt-0">
-                      {headline}
-                    </p>
+                    <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3 mt-1 sm:mt-0">{headline}</p>
                   </div>
                 </div>
               );
@@ -233,49 +441,33 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* Writing */}
+        {/* ── 3. Writing ─────────────────────────────────── */}
         {blogPosts.length > 0 && (
           <section>
             <div className="flex items-center justify-between mb-6">
               <SectionLabel mono>writing</SectionLabel>
-              <Link
-                href="/blog"
-                className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 group"
-              >
+              <Link href="/blog" className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 group">
                 All posts
                 <ArrowUpRight className="h-3 w-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
               </Link>
             </div>
             <div className="divide-y divide-border">
               {blogPosts.slice(0, 3).map((post) => {
-                const slug = typeof post.slug === "object"
-                  ? post.slug.current
-                  : post.slug;
+                const slug = typeof post.slug === "object" ? post.slug.current : post.slug;
                 const date = post.publishedAt
-                  ? new Date(post.publishedAt).toLocaleDateString("en-US", {
-                    month: "short",
-                    year: "numeric",
-                  })
+                  ? new Date(post.publishedAt).toLocaleDateString("en-US", { month: "short", year: "numeric" })
                   : "";
                 return (
-                  <Link
-                    key={post._id}
-                    href={`/blog/${slug}`}
+                  <Link key={post._id} href={`/blog/${slug}`}
                     className="flex items-start justify-between gap-4 py-4 group hover:bg-secondary/50 -mx-4 px-4 rounded-lg transition-colors"
                   >
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground group-hover:text-accent transition-colors leading-snug">
-                        {post.title}
-                      </p>
+                      <p className="text-sm font-medium text-foreground group-hover:text-accent transition-colors leading-snug">{post.title}</p>
                       {post.description && (
-                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">
-                          {post.description}
-                        </p>
+                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">{post.description}</p>
                       )}
                     </div>
-                    <span className="text-xs text-muted-foreground whitespace-nowrap shrink-0 pt-0.5">
-                      {date}
-                    </span>
+                    <span className="text-xs text-muted-foreground whitespace-nowrap shrink-0 pt-0.5">{date}</span>
                   </Link>
                 );
               })}
@@ -283,70 +475,12 @@ export default async function Home() {
           </section>
         )}
 
-        {/* Activity / Benchmarks */}
-        {(github || leetcode) && (
-          <section>
-            <SectionLabel mono>benchmarks</SectionLabel>
-            <div className="grid grid-cols-2 gap-3">
-              {github && (
-                <a
-                  href="https://github.com/meshivanshsinghh"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="border border-border bg-white rounded-xl p-5 hover:border-gray-300 hover:bg-gray-50/50 transition-all shadow-sm group"
-                >
-                  <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-3 font-mono">
-                    GitHub
-                  </p>
-                  <p className="text-3xl font-bold text-foreground leading-none mb-1">
-                    {github.publicRepos}
-                  </p>
-                  <p className="text-xs text-muted-foreground mb-4">public repos</p>
-                  <div className="h-px bg-border mb-3" />
-                  <p className="text-xs text-muted-foreground">{github.followers} followers</p>
-                  <p className="text-xs text-muted-foreground mt-1.5 group-hover:text-accent transition-colors font-mono">
-                    @meshivanshsinghh ↗
-                  </p>
-                </a>
-              )}
-              {leetcode && (
-                <a
-                  href="https://leetcode.com/u/shivanshsinghh"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="border border-border bg-white rounded-xl p-5 hover:border-gray-300 hover:bg-gray-50/50 transition-all shadow-sm group"
-                >
-                  <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-3 font-mono">
-                    LeetCode
-                  </p>
-                  <p className="text-3xl font-bold text-foreground leading-none mb-1">
-                    {leetcode.totalSolved}
-                  </p>
-                  <p className="text-xs text-muted-foreground mb-4">problems solved</p>
-                  <div className="h-px bg-border mb-3" />
-                  <div className="flex gap-2 text-xs font-mono">
-                    <span className="text-emerald-500">{leetcode.easySolved}E</span>
-                    <span className="text-amber-500">{leetcode.mediumSolved}M</span>
-                    <span className="text-red-500">{leetcode.hardSolved}H</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1.5 group-hover:text-accent transition-colors font-mono">
-                    @shivanshsinghh ↗
-                  </p>
-                </a>
-              )}
-            </div>
-          </section>
-        )}
-
-        {/* YouTube */}
+        {/* ── 4. YouTube ──────────────────────────────────── */}
         {videos.length > 0 && (
           <section>
             <div className="flex items-center justify-between mb-6">
               <SectionLabel mono>youtube</SectionLabel>
-              <a
-                href="https://youtube.com/@BackslashFlutter"
-                target="_blank"
-                rel="noopener noreferrer"
+              <a href="https://youtube.com/@BackslashFlutter" target="_blank" rel="noopener noreferrer"
                 className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 group"
               >
                 View channel
@@ -355,18 +489,11 @@ export default async function Home() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {videos.map((video) => (
-                <a
-                  key={video.videoId}
-                  href={video.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <a key={video.videoId} href={video.url} target="_blank" rel="noopener noreferrer"
                   className="group rounded-xl border border-border bg-white overflow-hidden hover:border-gray-300 transition-all shadow-sm flex flex-row sm:flex-col"
                 >
                   <div className="relative w-40 sm:w-full shrink-0 aspect-video bg-secondary overflow-hidden border-r sm:border-r-0 sm:border-b border-border">
-                    <Image
-                      src={video.thumbnail}
-                      alt={video.title}
-                      fill
+                    <Image src={video.thumbnail} alt={video.title} fill
                       className="object-cover group-hover:scale-[1.03] transition-transform duration-300"
                       sizes="(max-width: 640px) 160px, 33vw"
                     />
@@ -377,14 +504,9 @@ export default async function Home() {
                     </div>
                   </div>
                   <div className="p-3 flex-1 min-w-0 flex flex-col justify-center">
-                    <p className="text-xs font-medium text-foreground line-clamp-2 leading-snug mb-1.5">
-                      {video.title}
-                    </p>
+                    <p className="text-xs font-medium text-foreground line-clamp-2 leading-snug mb-1.5">{video.title}</p>
                     <p className="text-[10px] text-muted-foreground">
-                      {new Date(video.published).toLocaleDateString("en-US", {
-                        month: "short",
-                        year: "numeric",
-                      })}
+                      {new Date(video.published).toLocaleDateString("en-US", { month: "short", year: "numeric" })}
                     </p>
                   </div>
                 </a>
@@ -393,93 +515,19 @@ export default async function Home() {
           </section>
         )}
 
-        {/* Awards */}
+        {/* ── 5. Awards (Carousel) ────────────────────────── */}
         {awards.length > 0 && (
           <section>
             <SectionLabel mono>awards</SectionLabel>
-            <div className="divide-y divide-border">
-              {awards.map((award) => {
-                const id = "_id" in award
-                  ? (award as { _id: string })._id
-                  : (award as { id: string }).id;
-
-                let imageUrl: string | null = null;
-                if ("image" in award && award.image?.asset) {
-                  try {
-                    imageUrl = urlFor(award.image).width(128).height(128).url();
-                  } catch { imageUrl = null; }
-                }
-
-                const linkLabel = "linkLabel" in award && award.linkLabel
-                  ? award.linkLabel
-                  : "View";
-
-                return (
-                  <div key={id} className="py-5">
-                    <div className="flex gap-4">
-                      {/* Photo thumbnail */}
-                      {imageUrl && (
-                        <div className="relative w-16 h-16 rounded-lg overflow-hidden border border-border shrink-0">
-                          <Image
-                            src={imageUrl}
-                            alt={award.title}
-                            fill
-                            className="object-cover"
-                            sizes="64px"
-                          />
-                        </div>
-                      )}
-
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-foreground leading-snug mb-0.5">
-                              {award.title}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              {award.org}
-                              {"sponsor" in award && award.sponsor
-                                ? ` · sponsored by ${award.sponsor}`
-                                : ""}
-                            </p>
-                            {"note" in award && award.note && (
-                              <p className="text-xs text-muted-foreground mt-1 italic">
-                                {award.note}
-                              </p>
-                            )}
-                            {award.url && (
-                              <a
-                                href={award.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 text-xs text-accent hover:underline mt-2 font-medium"
-                              >
-                                {linkLabel}
-                                <ExternalLink className="h-3 w-3" />
-                              </a>
-                            )}
-                          </div>
-                          <span className="text-xs text-muted-foreground whitespace-nowrap shrink-0 pt-0.5">
-                            {award.date}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+            <AwardsCarousel awards={carouselAwards} />
           </section>
         )}
-
       </div>
 
-      {/* ── Contact section ─────────────────────────────── */}
+      {/* ── Contact ───────────────────────────────────────── */}
       <div id="contact" className="bg-[#111111]">
-        <div className="max-w-4xl mx-auto px-6 py-16 md:py-20">
+        <div className="max-w-5xl mx-auto px-6 py-16 md:py-20">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16">
-
-            {/* Left: headline + links */}
             <div className="flex flex-col justify-between gap-10">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-widest text-[#cc0000] mb-4 font-mono">
@@ -494,19 +542,14 @@ export default async function Home() {
                   <span className="text-white font-medium">Dec 2026</span>.
                 </p>
               </div>
-
               <div className="space-y-4">
                 <div className="flex flex-wrap gap-3">
-                  <a
-                    href="/resume.pdf"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <a href="/resume.pdf" target="_blank" rel="noopener noreferrer"
                     className="text-sm font-medium text-[#999999] hover:text-white border border-[#333333] hover:border-[#666666] px-4 py-2 rounded-lg transition-colors"
                   >
                     View CV ↗
                   </a>
-                  <Link
-                    href="/about"
+                  <Link href="/about"
                     className="text-sm font-medium text-[#999999] hover:text-white border border-[#333333] hover:border-[#666666] px-4 py-2 rounded-lg transition-colors"
                   >
                     Full background ↗
@@ -519,12 +562,7 @@ export default async function Home() {
                     { href: "https://x.com/shivanshneu", icon: Twitter, label: "Twitter" },
                     { href: "https://youtube.com/@BackslashFlutter", icon: Youtube, label: "YouTube" },
                   ].map((s) => (
-                    <a
-                      key={s.label}
-                      href={s.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={s.label}
+                    <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label}
                       className="text-[#999999] hover:text-white transition-colors"
                     >
                       <s.icon className="h-4 w-4" />
@@ -533,15 +571,10 @@ export default async function Home() {
                 </div>
               </div>
             </div>
-
-            {/* Right: contact form */}
             <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-[#999999] mb-5 font-mono">
-                get_in_touch
-              </p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-[#999999] mb-5 font-mono">get_in_touch</p>
               <ContactForm />
             </div>
-
           </div>
         </div>
       </div>
