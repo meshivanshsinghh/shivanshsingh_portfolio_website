@@ -67,7 +67,7 @@ export default function BlogPage() {
           placeholder="Search posts..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-9 pr-4 py-2 text-sm border border-border rounded-lg bg-white text-foreground focus:outline-none focus:border-muted-foreground placeholder:text-muted-foreground shadow-sm"
+          className="w-full pl-9 pr-4 py-2 text-sm border border-border rounded-lg bg-[#111111] text-foreground focus:outline-none focus:border-muted-foreground placeholder:text-muted-foreground shadow-sm"
         />
       </div>
 

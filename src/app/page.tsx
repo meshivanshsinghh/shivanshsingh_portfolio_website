@@ -51,7 +51,7 @@ function LeetCodeDonut({ easy, medium, hard }: { easy: number; medium: number; h
         <svg viewBox="0 0 100 100" className="w-full h-full">
           <g transform="rotate(-90 50 50)">
             {/* Background track */}
-            <circle cx="50" cy="50" r={r} fill="none" stroke="#f3f4f6" strokeWidth="7" />
+            <circle cx="50" cy="50" r={r} fill="none" stroke="#222222" strokeWidth="7" />
             {/* Easy — green */}
             {easyLen > 0 && (
               <circle cx="50" cy="50" r={r} fill="none"
@@ -218,7 +218,7 @@ export default async function Home() {
         {(github || leetcode) && (
           <section>
             <SectionLabel mono>capabilities</SectionLabel>
-            <div className="rounded-xl border border-border bg-white shadow-sm overflow-hidden">
+            <div className="rounded-xl border border-border bg-[#111111] shadow-sm overflow-hidden">
               {/* Terminal header */}
               <div className="flex items-center gap-2 px-5 py-3 border-b border-border bg-secondary/50">
                 <div className="flex gap-1.5">
@@ -307,7 +307,7 @@ export default async function Home() {
                                   <span className="w-24 sm:w-28 text-muted-foreground font-mono text-[11px] truncate shrink-0">
                                     {tag.tagName}
                                   </span>
-                                  <div className="flex-1 h-2 rounded-full bg-gray-100 overflow-hidden max-w-[200px]">
+                                  <div className="flex-1 h-2 rounded-full bg-[#222222] overflow-hidden max-w-[200px]">
                                     <div className="h-full rounded-full bg-[#cc0000]/60" style={{ width: `${pct}%` }} />
                                   </div>
                                   <span className="text-foreground font-medium font-mono w-6 text-right text-[11px]">
@@ -398,7 +398,7 @@ export default async function Home() {
               };
 
               return (
-                <div key={id} className="group/row rounded-xl border border-border bg-white overflow-hidden hover:border-gray-300 transition-all shadow-sm flex flex-row">
+                <div key={id} className="group/row rounded-xl border border-border bg-[#111111] overflow-hidden hover:border-[#333333] transition-all shadow-sm flex flex-row">
                   <div className="w-32 sm:w-48 md:w-64 aspect-[16/9] shrink-0 relative border-r border-border bg-secondary overflow-hidden">
                     <Image src={getProjectImage(id)} alt={project.title} fill
                       className="object-cover group-hover/row:scale-[1.03] transition-transform duration-500 opacity-90 group-hover/row:opacity-100"
@@ -417,7 +417,7 @@ export default async function Home() {
                           <span className="text-sm font-semibold text-foreground">{project.title}</span>
                         )}
                         {projectAward && (
-                          <span className="text-[10px] font-medium text-[#cc0000] bg-[#fff5f5] border border-[#ffd0d0] px-2 py-0.5 rounded-full whitespace-nowrap">
+                          <span className="text-[10px] font-medium text-[#cc0000] bg-[#cc0000]/10 border border-[#cc0000]/30 px-2 py-0.5 rounded-full whitespace-nowrap">
                             ✦ {projectAward}
                           </span>
                         )}
@@ -490,7 +490,7 @@ export default async function Home() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {videos.map((video) => (
                 <a key={video.videoId} href={video.url} target="_blank" rel="noopener noreferrer"
-                  className="group rounded-xl border border-border bg-white overflow-hidden hover:border-gray-300 transition-all shadow-sm flex flex-row sm:flex-col"
+                  className="group rounded-xl border border-border bg-[#111111] overflow-hidden hover:border-[#333333] transition-all shadow-sm flex flex-row sm:flex-col"
                 >
                   <div className="relative w-40 sm:w-full shrink-0 aspect-video bg-secondary overflow-hidden border-r sm:border-r-0 sm:border-b border-border">
                     <Image src={video.thumbnail} alt={video.title} fill
@@ -525,7 +525,7 @@ export default async function Home() {
       </div>
 
       {/* ── Contact ───────────────────────────────────────── */}
-      <div id="contact" className="bg-[#111111]">
+      <div id="contact" className="bg-[#0a0a0a] border-t border-border">
         <div className="max-w-5xl mx-auto px-6 py-16 md:py-20">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16">
             <div className="flex flex-col justify-between gap-10">

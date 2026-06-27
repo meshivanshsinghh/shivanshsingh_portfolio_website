@@ -197,7 +197,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         )}
 
         {/* Body */}
-        <div className="prose prose-neutral max-w-none
+        <div className="prose prose-invert max-w-none
           prose-headings:font-bold prose-headings:text-foreground prose-headings:tracking-tight
           prose-h2:text-xl prose-h2:mt-10 prose-h2:mb-4
           prose-h3:text-base prose-h3:mt-8 prose-h3:mb-3
@@ -205,9 +205,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           prose-a:text-[#cc0000] prose-a:no-underline hover:prose-a:underline
           prose-strong:text-foreground prose-strong:font-semibold
           prose-em:text-foreground
-          prose-code:text-[13px] prose-code:text-foreground prose-code:bg-secondary prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:font-mono prose-code:before:content-none prose-code:after:content-none
+          prose-code:text-[13px] prose-code:text-foreground prose-code:bg-[#1a1a1a] prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:font-mono prose-code:before:content-none prose-code:after:content-none
           prose-pre:bg-[#0f0f0f] prose-pre:text-[#e5e5e5] prose-pre:rounded-lg prose-pre:border prose-pre:border-[#222] prose-pre:text-[13px]
-          prose-blockquote:border-l-[3px] prose-blockquote:border-[#cc0000] prose-blockquote:bg-[#fff5f5] prose-blockquote:px-5 prose-blockquote:py-3 prose-blockquote:rounded-r prose-blockquote:text-foreground prose-blockquote:not-italic
+          prose-blockquote:border-l-[3px] prose-blockquote:border-[#cc0000] prose-blockquote:bg-[#cc0000]/8 prose-blockquote:px-5 prose-blockquote:py-3 prose-blockquote:rounded-r prose-blockquote:text-foreground prose-blockquote:not-italic
           prose-ul:my-4 prose-li:my-1
           prose-img:rounded-lg prose-img:border prose-img:border-border
           prose-hr:border-border">

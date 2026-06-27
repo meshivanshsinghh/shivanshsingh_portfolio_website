@@ -16,14 +16,14 @@ export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-white/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 w-full border-b border-border bg-[#080808]/90 backdrop-blur-xl">
       <div className="max-w-5xl mx-auto px-6 flex h-14 items-center justify-between">
         <Link
           href="/"
           className="flex items-center hover:opacity-80 transition-opacity"
           aria-label="Home"
         >
-          <div className="w-8 h-8 rounded-lg bg-foreground text-white flex items-center justify-center font-bold text-sm tracking-tight shadow-sm">
+          <div className="w-8 h-8 rounded-lg bg-[#cc0000] text-white flex items-center justify-center font-bold text-sm tracking-tight shadow-sm">
             SS
           </div>
         </Link>
@@ -65,7 +65,7 @@ export default function Header() {
 
       {/* Mobile nav */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-border bg-white">
+        <div className="md:hidden border-t border-border bg-[#0d0d0d]">
           <nav className="max-w-5xl mx-auto px-6 py-4 flex flex-col gap-3">
             {navigation.map((item) => (
               <Link
