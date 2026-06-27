@@ -83,7 +83,7 @@ function TqdmLine({
           {/* Progress bar */}
           <div className="flex items-center gap-0.5 shrink-0">
             <span className="text-muted-foreground/50">|</span>
-            <div className="w-[100px] sm:w-[120px] h-[7px] bg-gray-100 rounded-[2px] overflow-hidden relative">
+            <div className="w-[100px] sm:w-[120px] h-[7px] bg-[#222222] rounded-[2px] overflow-hidden relative">
               <motion.div
                 className="absolute inset-y-0 left-0 bg-[#cc0000] rounded-[2px]"
                 initial={{ width: "0%" }}
@@ -325,7 +325,7 @@ export default function ModelCard() {
 
   return (
     <section className="max-w-5xl mx-auto px-6 relative z-30 min-h-[580px] md:min-h-[420px]">
-      <div className="rounded-xl border border-border bg-white shadow-sm overflow-hidden">
+      <div className="rounded-xl border border-border bg-[#111111] shadow-sm overflow-hidden">
         {/* Header bar */}
         <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-border bg-secondary/50">
           <div className="flex items-center gap-2">
@@ -402,7 +402,7 @@ export default function ModelCard() {
                         <div className="flex flex-col md:flex-row gap-5 md:gap-8">
                           {/* Photo */}
                           <div className="shrink-0 flex justify-center md:justify-start">
-                            <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-xl overflow-hidden border border-border relative bg-secondary">
+                            <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-xl overflow-hidden border border-border relative bg-[#1a1a1a]">
                               <Image src="/gpt_image.png" alt="Shivansh Singh" fill className="object-cover object-top" sizes="(max-width: 640px) 112px, 128px" quality={95} priority />
                             </div>
                           </div>

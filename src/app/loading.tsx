@@ -1,6 +1,6 @@
 export default function Loading() {
   return (
-    <div className="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center gap-6">
+    <div className="fixed inset-0 z-50 bg-[#080808] flex flex-col items-center justify-center gap-6">
       {/* Tensor matrix visualization */}
       <div className="grid grid-cols-4 gap-1.5">
         {Array.from({ length: 16 }).map((_, i) => (

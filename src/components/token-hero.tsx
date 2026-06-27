@@ -76,7 +76,7 @@ const logLineVariants = { hidden: { opacity: 0, y: 5 }, show: { opacity: 1, y: 0
 
 const PytorchCode = () => (
   <motion.pre variants={containerVariants} initial="hidden" animate="show"
-    className="font-mono bg-transparent border-0 p-0 m-0 overflow-visible text-[10px] lg:text-[11px] text-black tracking-tight leading-relaxed flex flex-col"
+    className="font-mono bg-transparent border-0 p-0 m-0 overflow-visible text-[10px] lg:text-[11px] text-white/60 tracking-tight leading-relaxed flex flex-col"
   >
     <motion.div variants={lineVariants} className="flex gap-1.5 mb-3 opacity-60">
       <div className="w-2 h-2 rounded-full bg-[#ff5f56]" />
@@ -91,12 +91,12 @@ const PytorchCode = () => (
 
 const SystemLogs = () => (
   <motion.pre variants={logContainerVariants} initial="hidden" animate="show"
-    className="font-mono bg-transparent border-0 p-0 m-0 overflow-visible text-[10px] lg:text-[11px] text-black tracking-tight leading-relaxed flex flex-col items-end text-right"
+    className="font-mono bg-transparent border-0 p-0 m-0 overflow-visible text-[10px] lg:text-[11px] text-white/60 tracking-tight leading-relaxed flex flex-col items-end text-right"
   >
     <motion.div variants={logLineVariants} className="flex gap-1.5 mb-3 opacity-30 justify-end">
-      <div className="w-2 h-2 rounded-full bg-black" />
-      <div className="w-2 h-2 rounded-full bg-black" />
-      <div className="w-2 h-2 rounded-full bg-black" />
+      <div className="w-2 h-2 rounded-full bg-white/40" />
+      <div className="w-2 h-2 rounded-full bg-white/40" />
+      <div className="w-2 h-2 rounded-full bg-white/40" />
     </motion.div>
     {SYSTEM_LOG_LINES.map((line, i) => (
       <motion.div key={i} variants={logLineVariants} className="min-h-[1em]">{line}</motion.div>
@@ -112,12 +112,12 @@ function CodeWatermark() {
         WebkitMaskImage: "linear-gradient(to right, black 0%, black 15%, transparent 35%, transparent 65%, black 85%, black 100%)"
       }}
     >
-      <div className="absolute top-[40%] -translate-y-1/2 left-2 lg:left-8 opacity-40"><PytorchCode /></div>
-      <div className="absolute top-[40%] -translate-y-1/2 right-2 lg:right-8 opacity-40"><SystemLogs /></div>
-      <div className="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-white to-transparent z-10" />
-      <div className="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white to-transparent z-10" />
-      <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white to-transparent z-10" />
-      <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-white to-transparent z-10" />
+      <div className="absolute top-[40%] -translate-y-1/2 left-2 lg:left-8 opacity-50"><PytorchCode /></div>
+      <div className="absolute top-[40%] -translate-y-1/2 right-2 lg:right-8 opacity-50"><SystemLogs /></div>
+      <div className="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-[#080808] to-transparent z-10" />
+      <div className="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-[#080808] to-transparent z-10" />
+      <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#080808] to-transparent z-10" />
+      <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#080808] to-transparent z-10" />
     </div>
   );
 }
@@ -187,7 +187,7 @@ export default function TokenHero() {
                 exit={{ opacity: 0, scale: 0.98 }} transition={{ duration: 0.3 }}
                 className="flex flex-col items-center pt-2"
               >
-                <div className="flex items-center gap-2 text-sm text-foreground font-mono bg-white/90 backdrop-blur-md px-5 py-2 rounded-full shadow-sm border border-border">
+                <div className="flex items-center gap-2 text-sm text-foreground font-mono bg-[#111111]/90 backdrop-blur-md px-5 py-2 rounded-full shadow-sm border border-border">
                   <div className="h-2 w-2 rounded-full bg-[#cc0000] animate-pulse" />
                   <span>running tiktoken (cl100k_base)...</span>
                 </div>
@@ -217,14 +217,14 @@ export default function TokenHero() {
                                 animate={{ opacity: phase === "attention" ? 0.8 : 0 }}
                                 whileHover={{ opacity: 1 }}
                                 transition={{ duration: 0.3, delay: ti * 0.03 }}
-                                className="text-[9px] sm:text-[10px] font-mono text-zinc-500 whitespace-nowrap h-3 bg-white/90 px-1 rounded shadow-sm border border-border/50"
+                                className="text-[9px] sm:text-[10px] font-mono text-zinc-400 whitespace-nowrap h-3 bg-[#1a1a1a] px-1 rounded shadow-sm border border-border/50"
                               >
                                 {token.id}
                               </motion.span>
                               <span className={`inline-block px-2 sm:px-2.5 py-1 sm:py-1.5 rounded text-sm sm:text-base font-mono border transition-all duration-300 shadow-sm ${
                                 phase === "attention"
-                                  ? "border-[#cc0000]/30 bg-[#fff5f5] text-[#cc0000]"
-                                  : "border-border bg-white text-foreground hover:border-[#cc0000]/40 hover:bg-[#fff5f5] hover:text-[#cc0000]"
+                                  ? "border-[#cc0000]/40 bg-[#cc0000]/10 text-[#cc0000]"
+                                  : "border-border bg-[#161616] text-foreground hover:border-[#cc0000]/40 hover:bg-[#cc0000]/10 hover:text-[#cc0000]"
                               }`}>
                                 {token.text.trim()}
                               </span>
@@ -240,9 +240,9 @@ export default function TokenHero() {
                   transition={{ delay: 0.6, duration: 0.5 }}
                   className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-[9px] sm:text-[10px] font-mono text-muted-foreground pt-5"
                 >
-                  <span className="bg-white/90 backdrop-blur-md px-2 py-0.5 rounded border border-border shadow-sm">tokens: {TOKENS.length}</span>
-                  <span className="bg-white/90 backdrop-blur-md px-2 py-0.5 rounded border border-border shadow-sm">vocab: gpt-4o</span>
-                  <span className="bg-white/90 backdrop-blur-md px-2 py-0.5 rounded border border-border shadow-sm">encoding: cl100k_base</span>
+                  <span className="bg-[#111111] backdrop-blur-md px-2 py-0.5 rounded border border-border shadow-sm">tokens: {TOKENS.length}</span>
+                  <span className="bg-[#111111] backdrop-blur-md px-2 py-0.5 rounded border border-border shadow-sm">vocab: gpt-4o</span>
+                  <span className="bg-[#111111] backdrop-blur-md px-2 py-0.5 rounded border border-border shadow-sm">encoding: cl100k_base</span>
                 </motion.div>
               </motion.div>
             )}

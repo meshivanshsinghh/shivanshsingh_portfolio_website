@@ -215,11 +215,12 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           {/* Portable Text body */}
           {project.body && (
             <section>
-              <div className="prose prose-sm prose-neutral max-w-none text-foreground
+              <div className="prose prose-sm prose-invert max-w-none text-foreground
                 prose-headings:font-semibold prose-headings:text-foreground
                 prose-a:text-[#cc0000] prose-a:no-underline hover:prose-a:underline
-                prose-code:text-foreground prose-code:bg-secondary prose-code:px-1 prose-code:rounded
-                prose-pre:bg-secondary prose-pre:border prose-pre:border-border">
+                prose-code:text-foreground prose-code:bg-[#1a1a1a] prose-code:px-1 prose-code:rounded
+                prose-pre:bg-[#0f0f0f] prose-pre:border prose-pre:border-border
+                prose-blockquote:border-l-[3px] prose-blockquote:border-[#cc0000] prose-blockquote:bg-[#cc0000]/8 prose-blockquote:px-5 prose-blockquote:py-3">
                 <PortableText value={project.body} />
               </div>
             </section>
@@ -272,7 +273,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                   className="object-cover"
                 />
                 {image.caption && (
-                  <div className="absolute bottom-0 left-0 right-0 px-3 py-2 bg-white/90">
+                  <div className="absolute bottom-0 left-0 right-0 px-3 py-2 bg-[#111111]/90 backdrop-blur-sm">
                     <p className="text-xs text-muted-foreground">{image.caption}</p>
                   </div>
                 )}

@@ -57,7 +57,7 @@ export default function TravlogPage() {
           <span className="px-2 py-0.5 bg-secondary border border-border rounded text-muted-foreground">
             Full-time
           </span>
-          <span className="px-2 py-0.5 bg-[#fff5f5] border border-[#ffd0d0] rounded text-[#cc0000] font-medium">
+          <span className="px-2 py-0.5 bg-[#cc0000]/10 border border-[#cc0000]/30 rounded text-[#cc0000] font-medium">
             YC-tracked startup
           </span>
         </div>
