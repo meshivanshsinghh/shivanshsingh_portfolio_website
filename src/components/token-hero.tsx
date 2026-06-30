@@ -202,7 +202,7 @@ export default function TokenHero() {
                   {TOKEN_GROUPS.map((group, gi) => (
                     <div key={`sub-${gi}`} className="flex items-end gap-0.5">
                       {group.separator ? (
-                        <span className="text-muted-foreground text-lg px-1 pb-1 font-light bg-white/60 backdrop-blur-sm rounded-full">{group.word}</span>
+                        <span className="text-muted-foreground text-sm sm:text-base px-1 pb-1 font-mono border border-border bg-[#161616] rounded px-2 sm:px-2.5 py-1 sm:py-1.5 shadow-sm">{"&"}</span>
                       ) : (
                         group.tokens.map((ti, idx) => {
                           const token = TOKENS[ti];
