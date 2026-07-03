@@ -51,7 +51,7 @@ function LeetCodeDonut({ easy, medium, hard }: { easy: number; medium: number; h
         <svg viewBox="0 0 100 100" className="w-full h-full">
           <g transform="rotate(-90 50 50)">
             {/* Background track */}
-            <circle cx="50" cy="50" r={r} fill="none" stroke="#222222" strokeWidth="7" />
+            <circle cx="50" cy="50" r={r} fill="none" stroke="var(--code-bg)" strokeWidth="7" />
             {/* Easy — green */}
             {easyLen > 0 && (
               <circle cx="50" cy="50" r={r} fill="none"
@@ -218,11 +218,11 @@ export default async function Home() {
         {(github || leetcode) && (
           <section>
             <SectionLabel mono>capabilities</SectionLabel>
-            <div className="rounded-xl border border-border bg-[#111111] shadow-sm overflow-hidden">
+            <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
               {/* Terminal header */}
               <div className="flex items-center gap-2 px-5 py-3 border-b border-border bg-secondary/50">
                 <div className="flex gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#cc0000]/20" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-accent/20" />
                   <span className="w-2.5 h-2.5 rounded-full bg-yellow-400/50" />
                   <span className="w-2.5 h-2.5 rounded-full bg-green-400/50" />
                 </div>
@@ -269,6 +269,22 @@ export default async function Home() {
                       <span className="text-amber-600">{leetcode.mediumSolved}M</span>{" "}
                       <span className="text-red-600">{leetcode.hardSolved}H</span>)
                     </span>
+                    {/* Streak dots + text */}
+                    {leetcode.last7DaysMap && (
+                      <span className="hidden sm:flex items-center gap-1.5 ml-2">
+                        <span className="text-[10px] font-mono text-muted-foreground">{leetcode.streak}d streak</span>
+                        <span className="flex items-center gap-[3px]">
+                          {leetcode.last7DaysMap.map((active, i) => (
+                            <span
+                              key={i}
+                              className={`w-[6px] h-[6px] rounded-full ${
+                                active ? "bg-emerald-500" : "bg-border"
+                              }`}
+                            />
+                          ))}
+                        </span>
+                      </span>
+                    )}
                     <span className="ml-auto shrink-0 flex items-center gap-1.5">
                       <span className="text-green-600 text-[10px] font-mono font-semibold hidden sm:inline">PASS</span>
                       <ArrowUpRight className="h-3 w-3 text-muted-foreground group-hover:text-foreground transition-colors" />
@@ -307,8 +323,8 @@ export default async function Home() {
                                   <span className="w-24 sm:w-28 text-muted-foreground font-mono text-[11px] truncate shrink-0">
                                     {tag.tagName}
                                   </span>
-                                  <div className="flex-1 h-2 rounded-full bg-[#222222] overflow-hidden max-w-[200px]">
-                                    <div className="h-full rounded-full bg-[#cc0000]/60" style={{ width: `${pct}%` }} />
+                                  <div className="flex-1 h-2 rounded-full bg-code-bg overflow-hidden max-w-[200px]">
+                                    <div className="h-full rounded-full bg-accent/60" style={{ width: `${pct}%` }} />
                                   </div>
                                   <span className="text-foreground font-medium font-mono w-6 text-right text-[11px]">
                                     {tag.problemsSolved}
@@ -319,6 +335,43 @@ export default async function Home() {
                           </div>
                         </div>
                       )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Recent Activity */}
+                {leetcode && leetcode.recentSubmissions && leetcode.recentSubmissions.length > 0 && (
+                  <div className="border-t border-border pt-5 mt-2">
+                    <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest mb-4">
+                      Recent Activity
+                    </p>
+                    <div className="space-y-0">
+                      {leetcode.recentSubmissions.map((sub, i) => {
+                        const date = new Date(sub.timestamp * 1000);
+                        const month = date.toLocaleString("en-US", { month: "short" });
+                        const day = String(date.getDate()).padStart(2, "0");
+                        return (
+                          <a
+                            key={`${sub.titleSlug}-${i}`}
+                            href={`https://leetcode.com/problems/${sub.titleSlug}/`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-x-3 py-2 group hover:bg-secondary/30 -mx-3 px-3 rounded-lg transition-colors"
+                          >
+                            <span className="text-[11px] font-mono text-muted-foreground shrink-0">
+                              [{month} {day}]
+                            </span>
+                            <span className="text-green-600 text-sm font-mono">✓</span>
+                            <span className="text-sm font-mono text-foreground truncate flex-1 min-w-0 group-hover:text-white transition-colors">
+                              {sub.title}
+                            </span>
+                            <span className="text-[10px] font-mono text-emerald-600/70 shrink-0 hidden sm:inline">
+                              accepted
+                            </span>
+                            <ArrowUpRight className="h-3 w-3 text-muted-foreground group-hover:text-foreground transition-colors shrink-0 opacity-0 group-hover:opacity-100" />
+                          </a>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -398,7 +451,7 @@ export default async function Home() {
               };
 
               return (
-                <div key={id} className="group/row rounded-xl border border-border bg-[#111111] overflow-hidden hover:border-[#333333] transition-all shadow-sm flex flex-row">
+                <div key={id} className="group/row rounded-xl border border-border bg-card overflow-hidden hover:border-ring transition-all shadow-sm flex flex-row">
                   <div className="w-32 sm:w-48 md:w-64 aspect-[16/9] shrink-0 relative border-r border-border bg-secondary overflow-hidden">
                     <Image src={getProjectImage(id)} alt={project.title} fill
                       className="object-cover group-hover/row:scale-[1.03] transition-transform duration-500 opacity-90 group-hover/row:opacity-100"
@@ -417,7 +470,7 @@ export default async function Home() {
                           <span className="text-sm font-semibold text-foreground">{project.title}</span>
                         )}
                         {projectAward && (
-                          <span className="text-[10px] font-medium text-[#cc0000] bg-[#cc0000]/10 border border-[#cc0000]/30 px-2 py-0.5 rounded-full whitespace-nowrap">
+                          <span className="text-[10px] font-medium text-accent bg-accent/10 border border-accent/30 px-2 py-0.5 rounded-full whitespace-nowrap">
                             ✦ {projectAward}
                           </span>
                         )}
@@ -490,7 +543,7 @@ export default async function Home() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {videos.map((video) => (
                 <a key={video.videoId} href={video.url} target="_blank" rel="noopener noreferrer"
-                  className="group rounded-xl border border-border bg-[#111111] overflow-hidden hover:border-[#333333] transition-all shadow-sm flex flex-row sm:flex-col"
+                  className="group rounded-xl border border-border bg-card overflow-hidden hover:border-ring transition-all shadow-sm flex flex-row sm:flex-col"
                 >
                   <div className="relative w-40 sm:w-full shrink-0 aspect-video bg-secondary overflow-hidden border-r sm:border-r-0 sm:border-b border-border">
                     <Image src={video.thumbnail} alt={video.title} fill
@@ -525,32 +578,33 @@ export default async function Home() {
       </div>
 
       {/* ── Contact ───────────────────────────────────────── */}
-      <div id="contact" className="bg-[#0a0a0a] border-t border-border">
+      <div className="dark">
+        <div id="contact" className="bg-surface-sunken border-t border-border">
         <div className="max-w-5xl mx-auto px-6 py-16 md:py-20">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16">
             <div className="flex flex-col justify-between gap-10">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-widest text-[#cc0000] mb-4 font-mono">
+                <p className="text-xs font-semibold uppercase tracking-widest text-accent mb-4 font-mono">
                   location: Boston, MA
                 </p>
-                <h2 className="text-3xl md:text-4xl font-bold leading-tight mb-4 text-white">
+                <h2 className="text-3xl md:text-4xl font-bold leading-tight mb-4 text-foreground">
                   From notebooks<br />to production.
                 </h2>
-                <p className="text-sm text-[#999999] leading-relaxed">
+                <p className="text-sm text-text-dim leading-relaxed">
                   I build things end-to-end - data pipelines, ML models, APIs, and the frontends
                   that make them useful. Available for full-time roles starting{" "}
-                  <span className="text-white font-medium">Dec 2026</span>.
+                  <span className="text-foreground font-medium">Dec 2026</span>.
                 </p>
               </div>
               <div className="space-y-4">
                 <div className="flex flex-wrap gap-3">
                   <a href="/resume.pdf" target="_blank" rel="noopener noreferrer"
-                    className="text-sm font-medium text-[#999999] hover:text-white border border-[#333333] hover:border-[#666666] px-4 py-2 rounded-lg transition-colors"
+                    className="text-sm font-medium text-text-dim hover:text-foreground border border-border hover:border-muted-foreground px-4 py-2 rounded-lg transition-colors"
                   >
                     View CV ↗
                   </a>
                   <Link href="/about"
-                    className="text-sm font-medium text-[#999999] hover:text-white border border-[#333333] hover:border-[#666666] px-4 py-2 rounded-lg transition-colors"
+                    className="text-sm font-medium text-text-dim hover:text-foreground border border-border hover:border-muted-foreground px-4 py-2 rounded-lg transition-colors"
                   >
                     Full background ↗
                   </Link>
@@ -563,7 +617,7 @@ export default async function Home() {
                     { href: "https://youtube.com/@BackslashFlutter", icon: Youtube, label: "YouTube" },
                   ].map((s) => (
                     <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label}
-                      className="text-[#999999] hover:text-white transition-colors"
+                      className="text-text-dim hover:text-foreground transition-colors"
                     >
                       <s.icon className="h-4 w-4" />
                     </a>
@@ -572,12 +626,13 @@ export default async function Home() {
               </div>
             </div>
             <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-[#999999] mb-5 font-mono">get_in_touch</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-text-dim mb-5 font-mono">get_in_touch</p>
               <ContactForm />
             </div>
           </div>
         </div>
       </div>
+    </div>
     </>
   );
 }

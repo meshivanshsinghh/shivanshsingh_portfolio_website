@@ -27,12 +27,12 @@ export default function ContactForm() {
   if (status === "sent") {
     return (
       <div className="flex flex-col items-start justify-center h-full gap-3 py-8">
-        <CheckCircle className="h-8 w-8 text-[#cc0000]" />
-        <p className="text-white font-semibold">Message sent.</p>
-        <p className="text-sm text-[#999]">I&apos;ll get back to you shortly.</p>
+        <CheckCircle className="h-8 w-8 text-accent" />
+        <p className="text-foreground font-semibold">Message sent.</p>
+        <p className="text-sm text-text-dim">I&apos;ll get back to you shortly.</p>
         <button
           onClick={() => setStatus("idle")}
-          className="text-xs text-[#666] hover:text-white transition-colors mt-2"
+          className="text-xs text-muted-foreground hover:text-foreground transition-colors mt-2"
         >
           Send another
         </button>
@@ -47,14 +47,14 @@ export default function ContactForm() {
           name="name"
           required
           placeholder="Name"
-          className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#555] focus:outline-none focus:border-[#444] transition-colors"
+          className="bg-input border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-muted-foreground transition-colors"
         />
         <input
           name="email"
           type="email"
           required
           placeholder="Email"
-          className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#555] focus:outline-none focus:border-[#444] transition-colors"
+          className="bg-input border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-muted-foreground transition-colors"
         />
       </div>
       <textarea
@@ -62,18 +62,18 @@ export default function ContactForm() {
         required
         rows={4}
         placeholder="What are you working on?"
-        className="w-full bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#555] focus:outline-none focus:border-[#444] transition-colors resize-none"
+        className="w-full bg-input border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-muted-foreground transition-colors resize-none"
       />
       <button
         type="submit"
         disabled={status === "sending"}
-        className="inline-flex items-center gap-2 bg-[#cc0000] hover:bg-[#aa0000] disabled:opacity-60 text-white text-sm font-medium px-5 py-2.5 rounded-lg transition-colors"
+        className="inline-flex items-center gap-2 bg-accent hover:bg-accent/85 disabled:opacity-60 text-white text-sm font-medium px-5 py-2.5 rounded-lg transition-colors"
       >
         <Send className="h-3.5 w-3.5" />
         {status === "sending" ? "Sending..." : "Send message"}
       </button>
       {status === "error" && (
-        <p className="text-xs text-[#cc0000]">{errorMsg}</p>
+        <p className="text-xs text-accent">{errorMsg}</p>
       )}
     </form>
   );

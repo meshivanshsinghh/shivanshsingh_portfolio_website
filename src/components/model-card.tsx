@@ -42,7 +42,7 @@ const SOCIALS = [
   { name: "YouTube", href: "https://youtube.com/@BackslashFlutter", icon: Youtube },
 ];
 
-const T_DESKTOP = { init: 1600, trainDur: 2200, convergeDelta: 250, expandDelta: 350 };
+const T_DESKTOP = { init: 1000, trainDur: 1200, convergeDelta: 200, expandDelta: 250 };
 const TRAIN_EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
 // ─────────────────────────────────────────────────────────────────
@@ -83,9 +83,9 @@ function TqdmLine({
           {/* Progress bar */}
           <div className="flex items-center gap-0.5 shrink-0">
             <span className="text-muted-foreground/50">|</span>
-            <div className="w-[100px] sm:w-[120px] h-[7px] bg-[#222222] rounded-[2px] overflow-hidden relative">
+            <div className="w-[100px] sm:w-[120px] h-[7px] bg-code-bg rounded-[2px] overflow-hidden relative">
               <motion.div
-                className="absolute inset-y-0 left-0 bg-[#cc0000] rounded-[2px]"
+                className="absolute inset-y-0 left-0 bg-accent rounded-[2px]"
                 initial={{ width: "0%" }}
                 animate={{ width: "100%" }}
                 transition={{
@@ -321,16 +321,16 @@ export default function ModelCard() {
   const isTraining = phase !== "initializing";
   const isConverged = phase === "converged" || phase === "expanded";
   // Mobile bars fill fast (each epoch visible briefly), desktop slower
-  const epochFillDur = mobile ? 0.35 : 0.45;
+  const epochFillDur = mobile ? 0.25 : 0.20;
 
   return (
     <section className="max-w-5xl mx-auto px-6 relative z-30 min-h-[580px] md:min-h-[420px]">
-      <div className="rounded-xl border border-border bg-[#111111] shadow-sm overflow-hidden">
+      <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
         {/* Header bar */}
         <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-border bg-secondary/50">
           <div className="flex items-center gap-2">
             <div className="flex gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#cc0000]/20" />
+              <span className="w-2.5 h-2.5 rounded-full bg-accent/20" />
               <span className="w-2.5 h-2.5 rounded-full bg-yellow-400/50" />
               <span className="w-2.5 h-2.5 rounded-full bg-green-400/50" />
             </div>
@@ -353,7 +353,7 @@ export default function ModelCard() {
           <AnimatePresence mode="wait">
             {!isTraining ? (
               <motion.div key="init" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }} className="p-6 md:p-8">
-                <motion.p animate={{ opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.2 }} className="text-sm font-mono text-zinc-800 font-medium">
+                <motion.p animate={{ opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.2 }} className="text-sm font-mono text-muted-foreground font-medium">
                   &gt; Initializing training run...
                 </motion.p>
               </motion.div>
@@ -380,7 +380,7 @@ export default function ModelCard() {
                             className="flex flex-col sm:flex-row sm:items-baseline gap-0.5 sm:gap-3"
                           >
                             <span className="text-[11px] font-mono text-muted-foreground sm:w-28 shrink-0">{f.key}:</span>
-                            <span className={`text-sm font-medium ${f.accent ? "text-[#cc0000]" : "text-foreground"}`}>
+                            <span className={`text-sm font-medium ${f.accent ? "text-accent" : "text-foreground"}`}>
                               {f.accent && !isConverged ? (
                                 <motion.span animate={{ opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.5 }} className="text-muted-foreground">training...</motion.span>
                               ) : f.value}
@@ -402,7 +402,7 @@ export default function ModelCard() {
                         <div className="flex flex-col md:flex-row gap-5 md:gap-8">
                           {/* Photo */}
                           <div className="shrink-0 flex justify-center md:justify-start">
-                            <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-xl overflow-hidden border border-border relative bg-[#1a1a1a]">
+                            <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-xl overflow-hidden border border-border relative bg-muted">
                               <Image src="/gpt_image.png" alt="Shivansh Singh" fill className="object-cover object-top" sizes="(max-width: 640px) 112px, 128px" quality={95} priority />
                             </div>
                           </div>
@@ -445,7 +445,7 @@ export default function ModelCard() {
                                   href="/resume.pdf"
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1.5 text-[11px] font-mono text-[#cc0000] border border-[#cc0000]/30 hover:bg-[#fff5f5] px-2.5 py-1.5 rounded-lg transition-all font-medium"
+                                  className="inline-flex items-center gap-1.5 text-[11px] font-mono text-accent border border-accent/30 hover:bg-accent/10 px-2.5 py-1.5 rounded-lg transition-all font-medium"
                                 >
                                   <FileText className="h-3 w-3" />
                                   Resume ↗

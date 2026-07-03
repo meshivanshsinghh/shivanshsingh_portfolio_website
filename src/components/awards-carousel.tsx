@@ -43,7 +43,7 @@ export default function AwardsCarousel({ awards }: { awards: Award[] }) {
   return (
     <div>
       {/* Carousel viewport */}
-      <div className="relative overflow-hidden rounded-xl border border-border bg-[#111111] shadow-sm min-h-[120px]">
+      <div className="relative overflow-hidden rounded-xl border border-border bg-card shadow-sm min-h-[120px]">
         <AnimatePresence mode="wait" custom={direction}>
           <motion.div
             key={index}
