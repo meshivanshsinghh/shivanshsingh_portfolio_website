@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Metadata } from "next";
-import { ArrowLeft, Github, ExternalLink, Package, FileText, Trophy, BookOpen } from "lucide-react";
+import { ArrowLeft, Github, ExternalLink, Package, Trophy, BookOpen } from "lucide-react";
 import CopyCommand from "@/components/git-to-doc/copy-command";
 import VerifyTerminal from "@/components/git-to-doc/verify-terminal";
 
@@ -237,13 +237,6 @@ export default function GitToDocPage() {
               <BookOpen className="h-3 w-3" />
               README
             </a>
-            <span
-              aria-disabled="true"
-              className="inline-flex items-center gap-1.5 text-xs font-mono text-white/40 border border-dashed border-white/20 px-2.5 py-1.5 rounded-lg cursor-not-allowed"
-            >
-              <FileText className="h-3 w-3" />
-              Blog &middot; coming soon
-            </span>
           </div>
         </div>
       </section>
