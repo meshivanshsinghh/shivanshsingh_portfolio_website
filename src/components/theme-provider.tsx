@@ -22,8 +22,10 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
   const [theme, setTheme] = useState<Theme>("dark");
   const [mounted, setMounted] = useState(false);
 
-  // On mount, read from localStorage or system preference
+  // On mount, honor a stored choice; otherwise default to dark.
+  // Reading persisted theme is client-only, so it has to sync into state here.
   useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect -- localStorage is unavailable during SSR; theme must be resolved on mount */
     const stored = localStorage.getItem("theme") as Theme | null;
     if (stored === "light" || stored === "dark") {
       setTheme(stored);
@@ -32,6 +34,7 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
       setTheme("dark");
     }
     setMounted(true);
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
 
   // Sync the .dark class on <html> whenever theme changes

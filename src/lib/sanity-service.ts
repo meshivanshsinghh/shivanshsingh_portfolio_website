@@ -62,9 +62,11 @@ const PORTFOLIO_QUERY = `{
     date,
     note,
     image,
+    gallery,
     url,
     linkLabel,
-    order
+    order,
+    bentoSize
   }
 }`;
 

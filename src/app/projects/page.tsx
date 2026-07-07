@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { ArrowLeft, ExternalLink, Search } from "lucide-react";
 import { projects as staticProjects } from "@/data/projects";
+import { GIT_TO_DOC } from "@/data/git-to-doc";
 import { SanityProject } from "@/types/sanity";
 import { getCachedData } from "@/lib/sanity-service";
 
@@ -39,6 +40,7 @@ function toSanityShape(p: (typeof staticProjects)[number]): SanityProject & { he
 }
 
 const projectRoleMap: Record<string, string[]> = {
+  git_to_doc: ["MLE", "Applied Scientist", "AI Engineer", "Backend SWE"],
   dermrx_agent: ["MLE", "Applied Scientist", "AI Engineer", "Full-Stack SWE"],
   ncaa: ["MLE", "Applied Scientist", "Data Science"],
   rag_qa_system: ["MLE", "AI Engineer", "Backend SWE", "Full-Stack SWE"],
@@ -56,8 +58,12 @@ export default function ProjectsPage() {
   });
 
   const projectsData = useMemo(() => {
-    if (sanityProjects.length > 0) return sanityProjects;
-    return staticProjects.map(toSanityShape);
+    const base = sanityProjects.length > 0 ? sanityProjects : staticProjects.map(toSanityShape);
+    // Pin git-to-doc first; drop any duplicate if it ever also lands in Sanity.
+    const rest = base.filter(
+      (p) => p._id !== GIT_TO_DOC._id && p.slug?.current !== GIT_TO_DOC.slug.current
+    );
+    return [GIT_TO_DOC, ...rest];
   }, [sanityProjects]);
 
   const filtered = useMemo(() => {
@@ -85,7 +91,7 @@ export default function ProjectsPage() {
         </Link>
         <h1 className="text-2xl font-semibold text-foreground mb-2">Projects</h1>
         <p className="text-sm text-muted-foreground">
-          {staticProjects.length} projects - ranging from Kaggle competitions to production ML systems.
+          {projectsData.length} projects - ranging from Kaggle competitions to production ML systems.
         </p>
       </div>
 
@@ -125,14 +131,14 @@ export default function ProjectsPage() {
       {/* Projects list */}
       <div className="space-y-0 divide-y divide-border">
         {filtered.map((project) => {
-          const extended = project as typeof project & { headline?: string; techStack?: string[]; award?: string };
+          const extended = project as typeof project & { headline?: string; techStack?: string[]; award?: string; href?: string };
           return (
             <div key={project._id} className="py-6">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <Link
-                      href={`/projects/${project.slug.current}`}
+                      href={extended.href ?? `/projects/${project.slug.current}`}
                       className="text-sm font-semibold text-foreground hover:text-accent transition-colors"
                     >
                       {project.title}

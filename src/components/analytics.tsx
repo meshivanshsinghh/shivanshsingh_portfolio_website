@@ -5,6 +5,8 @@ import Script from "next/script";
 const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
 export default function Analytics() {
+  // Only load Google Analytics in production to prevent tracking local development
+  if (process.env.NODE_ENV !== "production") return null;
   if (!GA_ID) return null;
 
   return (

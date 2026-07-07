@@ -23,6 +23,22 @@ export const structure: StructureResolver = (S) =>
       
       S.divider(),
       
+      // About & Career Section
+      S.listItem()
+        .title('Resume & Awards')
+        .icon(UserIcon)
+        .child(
+          S.list()
+            .title('Resume & Awards')
+            .items([
+              S.documentTypeListItem('award').title('Awards & Hackathons'),
+              S.documentTypeListItem('experience').title('Experience'),
+              S.documentTypeListItem('education').title('Education'),
+            ])
+        ),
+      
+      S.divider(),
+      
       // Blog Section
       S.listItem()
         .title('Blog')

@@ -1,0 +1,312 @@
+#!/usr/bin/env python3
+"""
+gemini_export.py — Export an Antigravity conversation as Gemini CLI JSONL
+so Paxel's upload.sh will collect and ingest it.
+
+Output layout (matches ~/.gemini/tmp/<slug>/... which upload.sh scans):
+
+    <out-dir>/<slug>/
+        .project_root                    text file: project root path
+        chats/session-<uuid>.jsonl       transcript
+
+Event schema (best-guess from Paxel's TranscriptFormatDetector and
+GeminiNormalizer). The detector fires on either a header line with
+sessionId+projectHash OR any event with type=gemini. We emit both, so
+we hit whichever code path the normalizer prefers:
+
+    line 1  header
+        {"sessionId":"<uuid>", "projectHash":"<hash>",
+         "projectRoot":"<abs-path>", "conversationUuid":"<uuid>",
+         "source":"antigravity", "startTime":"<iso>"}
+
+    subsequent lines  events
+        {"type":"user", "content":"...", "timestamp":"<iso>",
+         "attachedFiles":[...]}
+
+        {"type":"gemini", "content":"...", "thoughts":["..."],
+         "toolCalls":[{"id":"toolu_...", "name":"...", "args":{...}}],
+         "model":"claude-opus (via vertex)", "requestId":"req_vrtx_...",
+         "tokens":{"in":N,"out":M}, "timestamp":"<iso>"}
+
+        {"type":"user", "toolResults":[{"toolUseId":"...", "command":"...",
+         "output":"...", "exitCode":N, "cwd":"..."}], "timestamp":"<iso>"}
+
+Ephemeral system messages, lifecycle checkpoints, and IDE-internal LLM
+subcalls are excluded — they match neither native Gemini CLI output nor
+the semantic content Paxel evaluates.
+
+Verify before submitting:
+    1. Preview to stdout:
+           python3 gemini_export.py <db> --preview | head -30
+    2. Write files, then confirm layout:
+           python3 gemini_export.py <db>
+           tree ~/.gemini/tmp/antigravity-*
+    3. Run Paxel's upload.sh (optionally with a dry-run flag if present).
+"""
+
+import sys
+import json
+import uuid
+import hashlib
+import argparse
+from pathlib import Path
+from typing import Optional
+from os.path import commonpath
+
+from models import load_conversation, Conversation, Turn, MODEL_ID_NAMES
+
+
+# Truncation caps for inlined content. Real Gemini CLI doesn't store full
+# file contents inline; the normalizer will accept truncated ones with a
+# marker as long as the tool_call metadata is intact.
+MAX_FILE_CONTENT_INLINE = 8000
+MAX_STDOUT_INLINE = 16000
+MAX_THOUGHT_INLINE = 20000
+
+
+def _iso(dt):
+    return dt.isoformat() if dt else ""
+
+
+def _truncate(s: str, limit: int) -> str:
+    if s is None:
+        return ""
+    if len(s) <= limit:
+        return s
+    return s[:limit] + f"\n... [truncated {len(s) - limit:,} more chars]"
+
+
+def turn_to_event(turn: Turn) -> Optional[dict]:
+    """Return a JSONL event dict, or None to skip this turn."""
+    if turn.role == "user":
+        evt = {
+            "type": "user",
+            "content": turn.text,
+            "timestamp": _iso(turn.created_at),
+        }
+        if turn.attached_files:
+            evt["attachedFiles"] = turn.attached_files
+        return evt
+
+    if turn.role == "assistant":
+        evt = {
+            "type": "gemini",
+            "content": turn.text,
+            "timestamp": _iso(turn.created_at),
+        }
+        if turn.thought:
+            evt["thoughts"] = [_truncate(turn.thought, MAX_THOUGHT_INLINE)]
+        if turn.tool_calls:
+            evt["toolCalls"] = [
+                {"id": tc.id, "name": tc.name, "args": tc.args}
+                for tc in turn.tool_calls
+            ]
+        if turn.model_id is not None:
+            evt["model"] = MODEL_ID_NAMES.get(turn.model_id, f"model_id={turn.model_id}")
+        if turn.output_tokens:
+            evt["tokens"] = {"in": turn.input_tokens or 0, "out": turn.output_tokens or 0}
+        if turn.request_id:
+            evt["requestId"] = turn.request_id
+        return evt
+
+    if turn.role == "tool_result":
+        tr = turn.tool_result
+        if tr is None:
+            return None
+        return {
+            "type": "user",
+            "content": "",
+            "timestamp": _iso(turn.created_at),
+            "toolResults": [{
+                "toolUseId": tr.tool_use_id,
+                "command": tr.command,
+                "output": _truncate(tr.stdout, MAX_STDOUT_INLINE),
+                "exitCode": tr.exit_code,
+                "cwd": tr.cwd,
+            }],
+        }
+
+    if turn.role == "file_read":
+        return {
+            "type": "user",
+            "content": "",
+            "timestamp": _iso(turn.created_at),
+            "toolResults": [{
+                "file": turn.attached_files[0] if turn.attached_files else "",
+                "output": _truncate(turn.text, MAX_FILE_CONTENT_INLINE),
+            }],
+        }
+
+    # ephemeral, parse_error, unknown, and skipped-checkpoint roles
+    return None
+
+
+def infer_project_root(conv: Conversation) -> str:
+    """Common ancestor of all shell cwds; fall back to file attachments."""
+    cwds = [
+        t.tool_result.cwd for t in conv.turns
+        if t.tool_result and t.tool_result.cwd
+    ]
+    if cwds:
+        try:
+            return commonpath(cwds)
+        except ValueError:
+            return cwds[0]
+
+    paths = []
+    for t in conv.turns:
+        for f in t.attached_files:
+            if f.startswith("file://"):
+                paths.append(f[len("file://"):])
+    if paths:
+        try:
+            return commonpath(paths)
+        except ValueError:
+            return paths[0]
+    return ""
+
+
+def summarize(conv: Conversation) -> dict:
+    """Counts for the summary printout."""
+    counts = {}
+    for t in conv.turns:
+        counts[t.role] = counts.get(t.role, 0) + 1
+    return counts
+
+
+def export_conversation(conv: Conversation, out_dir: Path,
+                        project_root: str = "", slug: str = "") -> Path:
+    session_id = str(uuid.uuid4())
+
+    if not project_root:
+        project_root = infer_project_root(conv)
+
+    if not slug:
+        seed = project_root or conv.uuid
+        slug = "antigravity-" + hashlib.sha256(seed.encode()).hexdigest()[:12]
+
+    project_hash = (
+        hashlib.sha256(project_root.encode()).hexdigest()[:16]
+        if project_root else ""
+    )
+
+    base = out_dir / slug
+    (base / "chats").mkdir(parents=True, exist_ok=True)
+    (base / ".project_root").write_text(project_root + "\n" if project_root else "")
+
+    start_time = ""
+    for t in conv.turns:
+        if t.created_at:
+            start_time = _iso(t.created_at)
+            break
+
+    jsonl_path = base / "chats" / f"session-{session_id}.jsonl"
+
+    events_written = 0
+    with jsonl_path.open("w") as fp:
+        fp.write(json.dumps({
+            "sessionId": session_id,
+            "projectHash": project_hash,
+            "projectRoot": project_root,
+            "conversationUuid": conv.uuid,
+            "taskUuid": conv.task_id,
+            "source": "antigravity",
+            "startTime": start_time,
+        }) + "\n")
+
+        for turn in conv.turns:
+            evt = turn_to_event(turn)
+            if evt is not None:
+                fp.write(json.dumps(evt) + "\n")
+                events_written += 1
+
+    return jsonl_path, events_written, slug, project_root
+
+
+def cmd_preview(args):
+    conv = load_conversation(args.db)
+    project_root = args.project_root or infer_project_root(conv)
+
+    header = {
+        "sessionId": "PREVIEW-" + conv.uuid[:8],
+        "projectHash": (
+            hashlib.sha256(project_root.encode()).hexdigest()[:16]
+            if project_root else ""
+        ),
+        "projectRoot": project_root,
+        "conversationUuid": conv.uuid,
+        "source": "antigravity",
+    }
+    print(json.dumps(header))
+
+    shown = 0
+    for turn in conv.turns:
+        evt = turn_to_event(turn)
+        if evt is None:
+            continue
+        if shown >= args.limit:
+            remaining = sum(1 for t in conv.turns if turn_to_event(t) is not None) - shown
+            print(f"... ({remaining} more events not shown)", file=sys.stderr)
+            break
+        print(json.dumps(evt))
+        shown += 1
+
+
+def cmd_export(args):
+    conv = load_conversation(args.db)
+    out_dir = Path(args.out).expanduser()
+    jsonl_path, events, slug, project_root = export_conversation(
+        conv, out_dir, args.project_root, args.slug
+    )
+
+    counts = summarize(conv)
+    print(f"# conversation:   {conv.uuid}")
+    print(f"# project_root:   {project_root or '(none detected)'}")
+    print(f"# slug:           {slug}")
+    print(f"# transcript:     {jsonl_path}")
+    print(f"# events written: {events}")
+    print(f"# turns by role:")
+    for r, n in sorted(counts.items(), key=lambda x: -x[1]):
+        print(f"    {r:<14} {n:>4}")
+    print()
+    print("# next steps:")
+    print("#   1. sanity check:  head -3 " + str(jsonl_path))
+    print("#   2. run Paxel:     bash upload.sh")
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    sub = ap.add_subparsers(dest="cmd")
+
+    e = sub.add_parser("export", help="write ~/.gemini/tmp/<slug>/... (default)")
+    e.add_argument("db")
+    e.add_argument("--out", default="~/.gemini/tmp",
+                   help="base output directory (default: ~/.gemini/tmp)")
+    e.add_argument("--project-root", default="",
+                   help="override the detected project root path")
+    e.add_argument("--slug", default="",
+                   help="override the slug directory name")
+    e.set_defaults(func=cmd_export)
+
+    p = sub.add_parser("preview", help="print JSONL to stdout without writing files")
+    p.add_argument("db")
+    p.add_argument("--project-root", default="")
+    p.add_argument("--limit", type=int, default=20)
+    p.set_defaults(func=cmd_preview)
+
+    # Convenience: `gemini_export.py <db>` defaults to export
+    args, _unused = ap.parse_known_args()
+    if args.cmd is None:
+        ap2 = argparse.ArgumentParser()
+        ap2.add_argument("db")
+        ap2.add_argument("--out", default="~/.gemini/tmp")
+        ap2.add_argument("--project-root", default="")
+        ap2.add_argument("--slug", default="")
+        args = ap2.parse_args()
+        args.func = cmd_export
+
+    args.func(args)
+
+
+if __name__ == "__main__":
+    main()
