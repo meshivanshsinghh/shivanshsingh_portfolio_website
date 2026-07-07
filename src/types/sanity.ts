@@ -66,9 +66,11 @@ export interface SanityAward {
   date: string;
   note?: string;
   image?: { asset: { _ref: string; _type: string }; hotspot?: unknown };
+  gallery?: Array<{ asset: { _ref: string; _type: string }; hotspot?: unknown }>;
   url?: string;
   linkLabel?: string;
   order: number;
+  bentoSize?: 'large' | 'wide' | 'square';
 }
 
 export interface SanityAnnouncement {

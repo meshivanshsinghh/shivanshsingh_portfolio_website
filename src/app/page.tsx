@@ -1,17 +1,18 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowUpRight, ExternalLink, Youtube, Github, Linkedin, Twitter } from "lucide-react";
+import { ArrowUpRight, Youtube, Github, Linkedin, Twitter, FileText } from "lucide-react";
 import ContactForm from "@/components/contact-form";
 import TokenHero from "@/components/token-hero";
 import ModelCard from "@/components/model-card";
-import AwardsCarousel from "@/components/awards-carousel";
+import BentoAwards from "@/components/bento-awards";
 import { featuredProjects } from "@/data/projects";
+import { GIT_TO_DOC } from "@/data/git-to-doc";
 import { awards as staticAwards } from "@/data/awards";
 import { fetchPortfolioData } from "@/lib/sanity-service";
-import { urlFor } from "@/lib/sanity";
 import { getGitHubStats } from "@/lib/github";
 import { getLeetCodeStats } from "@/lib/leetcode";
 import { getLatestVideos } from "@/lib/youtube";
+import { getMediumPosts } from "@/lib/medium";
 
 export const dynamic = "force-dynamic";
 
@@ -156,12 +157,13 @@ export default async function Home() {
   // Brief delay so the preloader animation plays
   await new Promise((resolve) => setTimeout(resolve, 1000));
 
-  const [portfolioData, githubStats, leetcodeStats, youtubeVideos] =
+  const [portfolioData, githubStats, leetcodeStats, youtubeVideos, mediumPosts] =
     await Promise.allSettled([
       fetchPortfolioData(),
       getGitHubStats("meshivanshsinghh"),
       getLeetCodeStats("shivanshsinghh"),
       getLatestVideos(3),
+      getMediumPosts(3),
     ]).then((results) =>
       results.map((r) => (r.status === "fulfilled" ? r.value : null))
     );
@@ -170,38 +172,29 @@ export default async function Home() {
     projects: [], blogPosts: [], experiences: [], educations: [], awards: [],
   };
 
-  const blogPosts = data.blogPosts ?? [];
   const awards = data.awards?.length ? data.awards : staticAwards;
-  const projects = (
+
+  // Experiments: featured projects + git-to-doc, sorted newest first.
+  // date strings look like "Jun 2026" — parseable by Date after a "1 " prefix.
+  const parseMonthYear = (s: string) => new Date(`1 ${s}`).getTime() || 0;
+  const baseFeatured =
     data.projects?.filter((p) => p.featured).length
       ? data.projects.filter((p) => p.featured)
-      : featuredProjects
-  ).slice(0, 3);
+      : featuredProjects;
+  const experiments = [
+    GIT_TO_DOC,
+    ...baseFeatured.filter((p) => {
+      const id = "_id" in p ? (p as { _id: string })._id : (p as { id: string }).id;
+      return id !== GIT_TO_DOC._id;
+    }),
+  ]
+    .sort((a, b) => parseMonthYear(b.date ?? "") - parseMonthYear(a.date ?? ""))
+    .slice(0, 4);
 
   const github = githubStats as Awaited<ReturnType<typeof getGitHubStats>>;
   const leetcode = leetcodeStats as Awaited<ReturnType<typeof getLeetCodeStats>>;
   const videos = (youtubeVideos as Awaited<ReturnType<typeof getLatestVideos>>) ?? [];
-
-  // Preprocess awards for carousel
-  const carouselAwards = awards.map((award) => {
-    const id = "_id" in award ? (award as { _id: string })._id : (award as { id: string }).id;
-    let imageUrl: string | null = null;
-    if ("image" in award && award.image?.asset) {
-      try { imageUrl = urlFor(award.image).width(128).height(128).url(); }
-      catch { imageUrl = null; }
-    }
-    return {
-      id,
-      title: award.title,
-      org: award.org,
-      date: award.date,
-      url: award.url || null,
-      imageUrl,
-      sponsor: "sponsor" in award && award.sponsor ? (award.sponsor as string) : null,
-      note: "note" in award && award.note ? (award.note as string) : null,
-      linkLabel: "linkLabel" in award && award.linkLabel ? (award.linkLabel as string) : "View",
-    };
-  });
+  const posts = (mediumPosts as Awaited<ReturnType<typeof getMediumPosts>>) ?? [];
 
   return (
     <>
@@ -277,9 +270,8 @@ export default async function Home() {
                           {leetcode.last7DaysMap.map((active, i) => (
                             <span
                               key={i}
-                              className={`w-[6px] h-[6px] rounded-full ${
-                                active ? "bg-emerald-500" : "bg-border"
-                              }`}
+                              className={`w-[6px] h-[6px] rounded-full ${active ? "bg-emerald-500" : "bg-border"
+                                }`}
                             />
                           ))}
                         </span>
@@ -362,7 +354,7 @@ export default async function Home() {
                               [{month} {day}]
                             </span>
                             <span className="text-green-600 text-sm font-mono">✓</span>
-                            <span className="text-sm font-mono text-foreground truncate flex-1 min-w-0 group-hover:text-white transition-colors">
+                            <span className="text-sm font-mono text-foreground truncate flex-1 min-w-0 group-hover:text-black dark:group-hover:text-white transition-colors">
                               {sub.title}
                             </span>
                             <span className="text-[10px] font-mono text-emerald-600/70 shrink-0 hidden sm:inline">
@@ -391,9 +383,8 @@ export default async function Home() {
                           {row.items.map((item) => (
                             <div
                               key={item.id}
-                              className={`flex flex-col items-center gap-1.5 w-[46px] sm:w-[52px] group/icon ${
-                                "mobileOnly" in item && item.mobileOnly ? "md:hidden" : ""
-                              }`}
+                              className={`flex flex-col items-center gap-1.5 w-[46px] sm:w-[52px] group/icon ${"mobileOnly" in item && item.mobileOnly ? "md:hidden" : ""
+                                }`}
                             >
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img
@@ -414,6 +405,7 @@ export default async function Home() {
 
                 {/* Footer */}
                 <div className="border-t border-border pt-3 mt-2">
+
                   <p className="text-[10px] font-mono text-green-600">
                     eval complete · 0 failures · 0 warnings
                   </p>
@@ -423,7 +415,21 @@ export default async function Home() {
           </section>
         )}
 
-        {/* ── 2. Projects ────────────────────────────────── */}
+        {/* ── 2. Awards (Bento Grid) ───────────────────────── */}
+        {awards.length > 0 && awards.some(a => {
+          const hasImage = "image" in a && (a as any).image?.asset;
+          const hasGallery = "gallery" in a && Array.isArray((a as any).gallery) && (a as any).gallery.length > 0;
+          return hasImage || hasGallery;
+        }) && (
+            <section>
+              <div className="flex items-center justify-between mb-6">
+                <SectionLabel mono>awards & hackathons</SectionLabel>
+              </div>
+              <BentoAwards awards={awards as any[]} />
+            </section>
+          )}
+
+        {/* ── 3. Projects (Experiments) ────────────────────── */}
         <section id="experiments">
           <div className="flex items-center justify-between mb-6">
             <SectionLabel mono>experiments</SectionLabel>
@@ -433,61 +439,77 @@ export default async function Home() {
             </Link>
           </div>
           <div className="flex flex-col gap-4">
-            {projects.map((project) => {
+            {experiments.map((project) => {
               const id = "_id" in project ? (project as { _id: string })._id : (project as { id: string }).id;
               const slug = "slug" in project && project.slug
                 ? (typeof project.slug === "object" ? (project.slug as { current: string }).current : project.slug)
                 : null;
               const headline = project.headline ?? project.description;
               const projectAward = project.award;
-              const link = project.link;
+              const href = "href" in project && typeof project.href === "string"
+                ? project.href
+                : slug
+                ? `/projects/${slug}`
+                : null;
+              const isShipped = id === GIT_TO_DOC._id;
+              const image = "image" in project && typeof project.image === "string" ? project.image : null;
 
-              const getProjectImage = (projId: string) => {
-                if ("image" in project && typeof project.image === "string") return project.image;
-                if (projId === "dermrx_agent") return "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=800&auto=format&fit=crop";
-                if (projId === "ncaa") return "https://images.unsplash.com/photo-1518063319789-7217e6706b04?q=80&w=800&auto=format&fit=crop";
-                if (projId === "rag_qa_system") return "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=800&auto=format&fit=crop";
-                return "https://images.unsplash.com/photo-1555949963-aa79dcee981c?q=80&w=800&auto=format&fit=crop";
-              };
-
-              return (
-                <div key={id} className="group/row rounded-xl border border-border bg-card overflow-hidden hover:border-ring transition-all shadow-sm flex flex-row">
+              const cardInner = (
+                <>
+                  {/* Left rail: real image for shipped projects, honest terminal-style placeholder for WIP */}
                   <div className="w-32 sm:w-48 md:w-64 aspect-[16/9] shrink-0 relative border-r border-border bg-secondary overflow-hidden">
-                    <Image src={getProjectImage(id)} alt={project.title} fill
-                      className="object-cover group-hover/row:scale-[1.03] transition-transform duration-500 opacity-90 group-hover/row:opacity-100"
-                      sizes="(max-width: 640px) 128px, (max-width: 768px) 192px, 256px"
-                    />
-                    <div className="absolute inset-0 bg-black/5 group-hover/row:bg-transparent transition-colors pointer-events-none" />
+                    {image ? (
+                      <Image src={image} alt={project.title} fill
+                        className="object-cover group-hover/row:scale-[1.03] transition-transform duration-500"
+                        sizes="(max-width: 640px) 128px, (max-width: 768px) 192px, 256px"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 bg-surface-sunken px-3 text-center">
+                        <FileText className="h-4 w-4 text-muted-foreground/60" strokeWidth={1.5} />
+                        <span className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground">
+                          writeup.md
+                        </span>
+                        <span className="text-[9px] font-mono text-accent/80">
+                          in progress
+                        </span>
+                      </div>
+                    )}
                   </div>
                   <div className="p-4 sm:p-5 flex-1 min-w-0 w-full flex flex-col justify-center">
                     <div className="flex items-start justify-between gap-3 mb-1.5">
                       <div className="flex items-center gap-2.5 flex-wrap min-w-0">
-                        {slug ? (
-                          <Link href={`/projects/${slug}`} className="text-sm font-semibold text-foreground hover:text-accent transition-colors">
-                            {project.title}
-                          </Link>
-                        ) : (
-                          <span className="text-sm font-semibold text-foreground">{project.title}</span>
-                        )}
+                        <span className="text-sm font-semibold text-foreground group-hover/row:text-accent transition-colors">
+                          {project.title}
+                        </span>
                         {projectAward && (
                           <span className="text-[10px] font-medium text-accent bg-accent/10 border border-accent/30 px-2 py-0.5 rounded-full whitespace-nowrap">
                             ✦ {projectAward}
                           </span>
                         )}
-                      </div>
-                      <div className="flex items-center gap-2 shrink-0 text-xs text-muted-foreground whitespace-nowrap pt-0.5">
-                        <span>{project.date}</span>
-                        {link && (
-                          <a href={link} target="_blank" rel="noopener noreferrer" aria-label={`Open ${project.title}`}
-                            className="text-muted-foreground hover:text-foreground transition-colors"
-                          >
-                            <ExternalLink className="h-3 w-3" />
-                          </a>
+                        {!isShipped && (
+                          <span className="text-[10px] font-mono text-muted-foreground/70 border border-border rounded px-1.5 py-0.5">
+                            writeup in progress
+                          </span>
                         )}
                       </div>
+                      <span className="text-xs text-muted-foreground whitespace-nowrap shrink-0 pt-0.5">
+                        {project.date}
+                      </span>
                     </div>
                     <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3 mt-1 sm:mt-0">{headline}</p>
                   </div>
+                </>
+              );
+
+              const cardClass = "group/row rounded-xl border border-border bg-card overflow-hidden hover:border-ring transition-all shadow-sm flex flex-row";
+
+              return href ? (
+                <Link key={id} href={href} className={cardClass}>
+                  {cardInner}
+                </Link>
+              ) : (
+                <div key={id} className={cardClass}>
+                  {cardInner}
                 </div>
               );
             })}
@@ -495,7 +517,7 @@ export default async function Home() {
         </section>
 
         {/* ── 3. Writing ─────────────────────────────────── */}
-        {blogPosts.length > 0 && (
+        {posts.length > 0 && (
           <section>
             <div className="flex items-center justify-between mb-6">
               <SectionLabel mono>writing</SectionLabel>
@@ -505,23 +527,23 @@ export default async function Home() {
               </Link>
             </div>
             <div className="divide-y divide-border">
-              {blogPosts.slice(0, 3).map((post) => {
-                const slug = typeof post.slug === "object" ? post.slug.current : post.slug;
-                const date = post.publishedAt
-                  ? new Date(post.publishedAt).toLocaleDateString("en-US", { month: "short", year: "numeric" })
-                  : "";
+              {posts.map((post) => {
+                const date = new Date(post.publishedAt).toLocaleDateString("en-US", { month: "short", year: "numeric" });
                 return (
-                  <Link key={post._id} href={`/blog/${slug}`}
+                  <a key={post.url} href={post.url} target="_blank" rel="noopener noreferrer"
                     className="flex items-start justify-between gap-4 py-4 group hover:bg-secondary/50 -mx-4 px-4 rounded-lg transition-colors"
                   >
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground group-hover:text-accent transition-colors leading-snug">{post.title}</p>
-                      {post.description && (
-                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">{post.description}</p>
+                      <p className="text-sm font-medium text-foreground group-hover:text-accent transition-colors leading-snug flex items-center gap-1.5">
+                        {post.title}
+                        <ArrowUpRight className="h-3 w-3 shrink-0 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+                      </p>
+                      {post.excerpt && (
+                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">{post.excerpt}</p>
                       )}
                     </div>
                     <span className="text-xs text-muted-foreground whitespace-nowrap shrink-0 pt-0.5">{date}</span>
-                  </Link>
+                  </a>
                 );
               })}
             </div>
@@ -568,71 +590,64 @@ export default async function Home() {
           </section>
         )}
 
-        {/* ── 5. Awards (Carousel) ────────────────────────── */}
-        {awards.length > 0 && (
-          <section>
-            <SectionLabel mono>awards</SectionLabel>
-            <AwardsCarousel awards={carouselAwards} />
-          </section>
-        )}
       </div>
 
       {/* ── Contact ───────────────────────────────────────── */}
       <div className="dark">
         <div id="contact" className="bg-surface-sunken border-t border-border">
-        <div className="max-w-5xl mx-auto px-6 py-16 md:py-20">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16">
-            <div className="flex flex-col justify-between gap-10">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-widest text-accent mb-4 font-mono">
-                  location: Boston, MA
-                </p>
-                <h2 className="text-3xl md:text-4xl font-bold leading-tight mb-4 text-foreground">
-                  From notebooks<br />to production.
-                </h2>
-                <p className="text-sm text-text-dim leading-relaxed">
-                  I build things end-to-end - data pipelines, ML models, APIs, and the frontends
-                  that make them useful. Available for full-time roles starting{" "}
-                  <span className="text-foreground font-medium">Dec 2026</span>.
-                </p>
-              </div>
-              <div className="space-y-4">
-                <div className="flex flex-wrap gap-3">
-                  <a href="/resume.pdf" target="_blank" rel="noopener noreferrer"
-                    className="text-sm font-medium text-text-dim hover:text-foreground border border-border hover:border-muted-foreground px-4 py-2 rounded-lg transition-colors"
-                  >
-                    View CV ↗
-                  </a>
-                  <Link href="/about"
-                    className="text-sm font-medium text-text-dim hover:text-foreground border border-border hover:border-muted-foreground px-4 py-2 rounded-lg transition-colors"
-                  >
-                    Full background ↗
-                  </Link>
+          <div className="max-w-5xl mx-auto px-6 py-16 md:py-20">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16">
+              <div className="flex flex-col justify-between gap-10">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-widest text-accent mb-4 font-mono">
+                    location: Boston, MA
+                  </p>
+                  <h2 className="text-3xl md:text-4xl font-bold leading-tight mb-4 text-foreground">
+                    From notebooks<br />to production.
+                  </h2>
+                  <p className="text-sm text-text-dim leading-relaxed">
+                    I build things end-to-end - data pipelines, ML models, APIs, and the frontends
+                    that make them useful. Available for full-time roles starting{" "}
+                    <span className="text-foreground font-medium">Dec 2026</span>.
+                  </p>
                 </div>
-                <div className="flex items-center gap-4 pt-1">
-                  {[
-                    { href: "https://github.com/meshivanshsinghh", icon: Github, label: "GitHub" },
-                    { href: "https://linkedin.com/in/shivanshsinghh", icon: Linkedin, label: "LinkedIn" },
-                    { href: "https://x.com/shivanshneu", icon: Twitter, label: "Twitter" },
-                    { href: "https://youtube.com/@BackslashFlutter", icon: Youtube, label: "YouTube" },
-                  ].map((s) => (
-                    <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label}
-                      className="text-text-dim hover:text-foreground transition-colors"
+                <div className="space-y-4">
+                  <div className="flex flex-wrap gap-3">
+                    <a href="/resume.pdf" target="_blank" rel="noopener noreferrer"
+                      className="text-sm font-medium text-text-dim hover:text-foreground border border-border hover:border-muted-foreground px-4 py-2 rounded-lg transition-colors"
                     >
-                      <s.icon className="h-4 w-4" />
+                      View CV ↗
                     </a>
-                  ))}
+                    <Link href="/about"
+                      className="text-sm font-medium text-text-dim hover:text-foreground border border-border hover:border-muted-foreground px-4 py-2 rounded-lg transition-colors"
+                    >
+                      Full background ↗
+                    </Link>
+                  </div>
+                  <div className="flex items-center gap-4 pt-1">
+                    {[
+                      { href: "https://github.com/meshivanshsinghh", icon: Github, label: "GitHub" },
+                      { href: "https://linkedin.com/in/shivanshsinghh", icon: Linkedin, label: "LinkedIn" },
+                      { href: "https://x.com/shivanshneu", icon: Twitter, label: "Twitter" },
+                      { href: "https://youtube.com/@BackslashFlutter", icon: Youtube, label: "YouTube" },
+                    ].map((s) => (
+                      <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label}
+                        className="text-text-dim hover:text-foreground transition-colors"
+                      >
+                        <s.icon className="h-4 w-4" />
+                      </a>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-text-dim mb-5 font-mono">get_in_touch</p>
-              <ContactForm />
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-widest text-text-dim mb-5 font-mono">get_in_touch</p>
+                <ContactForm />
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
     </>
   );
 }

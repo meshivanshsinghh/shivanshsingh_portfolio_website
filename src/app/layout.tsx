@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/layout/header";
-import Footer from "@/components/layout/footer";
+import ClientLayout from "@/components/layout/client-layout";
 import Analytics from "@/components/analytics";
 import ThemeProvider from "@/components/theme-provider";
 
@@ -58,11 +57,14 @@ export default function RootLayout({
             __html: `
               (function() {
                 try {
+                  // Default to dark unless the visitor has explicitly chosen light.
                   var theme = localStorage.getItem('theme');
-                  if (theme === 'dark' || !theme) {
+                  if (theme !== 'light') {
                     document.documentElement.classList.add('dark');
                   }
-                } catch(e) {}
+                } catch(e) {
+                  document.documentElement.classList.add('dark');
+                }
               })();
             `,
           }}
@@ -71,9 +73,7 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}>
         <ThemeProvider>
           <Analytics />
-          <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
+          <ClientLayout>{children}</ClientLayout>
         </ThemeProvider>
       </body>
     </html>

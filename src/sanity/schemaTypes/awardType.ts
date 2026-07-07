@@ -42,10 +42,17 @@ export const awardType = defineType({
     }),
     defineField({
       name: 'image',
-      title: 'Photo / Certificate (optional)',
+      title: 'Primary Photo / Certificate (optional)',
       type: 'image',
-      description: 'Upload a photo from the event, a LinkedIn post screenshot, or the certificate',
+      description: 'Upload a primary photo from the event, a LinkedIn post screenshot, or the certificate',
       options: { hotspot: true },
+    }),
+    defineField({
+      name: 'gallery',
+      title: 'Photo Gallery',
+      type: 'array',
+      of: [{ type: 'image', options: { hotspot: true } }],
+      description: 'Upload multiple photos. If provided, these will display as a fading slideshow in the bento tile.',
     }),
     defineField({
       name: 'url',
@@ -65,6 +72,21 @@ export const awardType = defineType({
       type: 'number',
       description: 'Lower number = appears first.',
       validation: (Rule) => Rule.required().integer().positive(),
+    }),
+    defineField({
+      name: 'bentoSize',
+      title: 'Bento Grid Size',
+      type: 'string',
+      description: 'Size of the award in the bento grid layout (only applies if it has an image)',
+      options: {
+        list: [
+          { title: 'Large (2x2)', value: 'large' },
+          { title: 'Wide (2x1)', value: 'wide' },
+          { title: 'Square (1x1)', value: 'square' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'square',
     }),
   ],
   preview: {

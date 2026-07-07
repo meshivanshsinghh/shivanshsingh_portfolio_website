@@ -21,7 +21,7 @@ async function getBlogPosts(): Promise<{ slug: string; publishedAt: string }[]> 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const blogPosts = await getBlogPosts();
 
-  // Only the landing page and individual blog posts are indexed.
+  // The landing page, /git-to-doc, and individual blog posts are indexed.
   // /about, /projects, /work/* use noindex meta tags (see their layout.tsx files).
   return [
     {
@@ -29,6 +29,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 1,
+    },
+    {
+      url: `${BASE_URL}/git-to-doc`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.9,
     },
     ...blogPosts.map(({ slug, publishedAt }) => ({
       url: `${BASE_URL}/blog/${slug}`,
