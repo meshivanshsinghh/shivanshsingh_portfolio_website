@@ -7,10 +7,10 @@ import Footer from "./footer";
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   
-  // If we are in the Sanity Studio route, don't render the global header/footer
-  const isStudio = pathname?.startsWith("/studio");
+  // Sanity Studio and the /amazon referral story are full-screen: no global header/footer
+  const isBare = pathname?.startsWith("/studio") || pathname === "/amazon";
 
-  if (isStudio) {
+  if (isBare) {
     return <main className="flex-1">{children}</main>;
   }
 

@@ -24,7 +24,7 @@ const CONFIG: { key: string; value: string; accent?: boolean }[] = [
   { key: "based_in", value: "Boston, MA" },
   { key: "currently", value: "Northeastern · FIA · git-to-doc" },
   { key: "focus", value: "ML systems + production" },
-  { key: "status", value: "Available Sep 2026", accent: true },
+  { key: "status", value: "Available Dec 2026", accent: true },
 ];
 
 const BIO_PRE =
@@ -432,7 +432,7 @@ export default function ModelCard() {
                         transition={{ duration: 0.3, delay: 0.25 }}
                         className="mt-4 text-[11px] font-mono text-green-600"
                       >
-                        ✓ Checkpoint saved: shivansh-2026.pt &middot; Available Sep 2026
+                        ✓ Checkpoint saved: shivansh-2026.pt &middot; Available Dec 2026
                       </motion.p>
                     )}
                   </motion.div>
